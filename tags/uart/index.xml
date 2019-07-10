@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>UART on The IMSAI Gang</title>
+    <link>/tags/uart/</link>
+    <description>Recent content in UART on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 12 Mar 2019 13:21:53 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/uart/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>IMSAI SIO(Serial I/O) Card Debugging</title>
+      <link>/posts/imsai_sio_debugging/</link>
+      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
+      
+      <guid>/posts/imsai_sio_debugging/</guid>
+      <description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Debugging and Repair // TODO
+ECHO Code The following code was takne from The Retro Wagon</description>
+    </item>
+    
+  </channel>
+</rss>

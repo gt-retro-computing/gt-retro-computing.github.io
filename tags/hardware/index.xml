@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hardware on The IMSAI Gang</title>
+    <link>/tags/hardware/</link>
+    <description>Recent content in Hardware on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/hardware/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Take a First Spin at the 8 Inch Floppy</title>
+      <link>/posts/8_inch_floppy_first_spin/</link>
+      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      
+      <guid>/posts/8_inch_floppy_first_spin/</guid>
+      <description>On Friday of last week, we finally got our hands on our first 8&amp;rdquo; floppy disk. We have plaied with the drive a lot earlier on, but since we had no disk, we never got to try the actual read and write function of the disk drives. In short this is one of those debugging where we had very &amp;ldquo;good luck&amp;rdquo;. In essense we encountered nearly 0 problem. Basically everything worked according to the Manual.</description>
+    </item>
+    
+    <item>
+      <title>New SIO Compatable Serial Card</title>
+      <link>/posts/new_sio_compatable_serial_card/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/posts/new_sio_compatable_serial_card/</guid>
+      <description>Update 2019-April-22: This totally did not work out the way I intended to. This post is here to document the process of how NOT to design a I/O port card with MCU on the S100 Bus. Please read the post about debuggin the original serial card if you are curious about how our USART works. (or a potential post about the repair. Long story short, we got the orignal serial card working after spending a crap load of effort on debugging the 72MHz ARM Processor not being &amp;ldquo;fast engough&amp;rdquo; to catch the OUT data.</description>
+    </item>
+    
+    <item>
+      <title>IMSAI SIO(Serial I/O) Card Debugging</title>
+      <link>/posts/imsai_sio_debugging/</link>
+      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
+      
+      <guid>/posts/imsai_sio_debugging/</guid>
+      <description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Debugging and Repair // TODO
+ECHO Code The following code was takne from The Retro Wagon</description>
+    </item>
+    
+    <item>
+      <title>The MMU - Part 1: Design and measure</title>
+      <link>/posts/mmu_design/</link>
+      <pubDate>Fri, 01 Mar 2019 12:08:13 -0500</pubDate>
+      
+      <guid>/posts/mmu_design/</guid>
+      <description>Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &amp;ldquo;virtual address spaces&amp;rdquo;. This is great solution for multiple programs competing for the same blocks of memory.</description>
+    </item>
+    
+    <item>
+      <title>Memory Dumper</title>
+      <link>/posts/memory_dumper/</link>
+      <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/memory_dumper/</guid>
+      <description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
+With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
+    </item>
+    
+    <item>
+      <title>Front Panel Broke Down: A Dead 74LS10</title>
+      <link>/posts/frontpanel_broke_down/</link>
+      <pubDate>Tue, 05 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/frontpanel_broke_down/</guid>
+      <description>Front panel repair During the process of testing the memory dumper card, we found some how the front panel is behaving weirdly.
+Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10 (Dual Tri-input NAND gates). Which controls the input switches.</description>
+    </item>
+    
+    <item>
+      <title>Power Up!</title>
+      <link>/posts/powerup/</link>
+      <pubDate>Fri, 01 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/powerup/</guid>
+      <description>The IMSAI 8080  TLDR; this post documents the IMSAI system as we got it.
+ Through the VIP program at Georgia Tech, we were able to acquire an IMSAI 8080 system to work on. Initially I had little to no knowledge about the IMSAI system. Through some quick web search we were able to find the manual for the computer and understand some history behind it.
+History The IMSAI 8080 is one of the first desktop computer at the time.</description>
+    </item>
+    
+  </channel>
+</rss>

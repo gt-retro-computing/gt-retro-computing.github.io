@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Software on The IMSAI Gang</title>
+    <link>/tags/software/</link>
+    <description>Recent content in Software on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 02 Apr 2019 12:23:09 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/software/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GWASM - The 8080 Assembler</title>
+      <link>/posts/assembler/</link>
+      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/assembler/</guid>
+      <description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
+The finished assembler can be found on our Github repository
+Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
+Flex rules
+ %{ #include &amp;quot;helpers.</description>
+    </item>
+    
+    <item>
+      <title>Memory Dumper</title>
+      <link>/posts/memory_dumper/</link>
+      <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/memory_dumper/</guid>
+      <description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
+With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
+    </item>
+    
+    <item>
+      <title>Fibonacci! - First program!</title>
+      <link>/posts/first_program/</link>
+      <pubDate>Sat, 02 Feb 2019 12:08:13 -0500</pubDate>
+      
+      <guid>/posts/first_program/</guid>
+      <description>Computing the Fibonacci Series We have got the computer operational again. As of right now, everything essential is working again. The IMSAI 8080 come with a input and output both addressed on port 0xFF which maps to the higher 8 bits of address and the 8 led on the top left corner of the front panel.
+The first program we decided to run on the machine is to compute the fibonacci series and display them one at a time on the front panel led.</description>
+    </item>
+    
+  </channel>
+</rss>

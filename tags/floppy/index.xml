@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Floppy on The IMSAI Gang</title>
+    <link>/tags/floppy/</link>
+    <description>Recent content in Floppy on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/floppy/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Take a First Spin at the 8 Inch Floppy</title>
+      <link>/posts/8_inch_floppy_first_spin/</link>
+      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      
+      <guid>/posts/8_inch_floppy_first_spin/</guid>
+      <description>On Friday of last week, we finally got our hands on our first 8&amp;rdquo; floppy disk. We have plaied with the drive a lot earlier on, but since we had no disk, we never got to try the actual read and write function of the disk drives. In short this is one of those debugging where we had very &amp;ldquo;good luck&amp;rdquo;. In essense we encountered nearly 0 problem. Basically everything worked according to the Manual.</description>
+    </item>
+    
+  </channel>
+</rss>

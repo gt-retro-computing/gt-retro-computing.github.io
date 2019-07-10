@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on The IMSAI Gang</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Floppy</title>
+      <link>/tags/floppy/</link>
+      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      
+      <guid>/tags/floppy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hardware</title>
+      <link>/tags/hardware/</link>
+      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      
+      <guid>/tags/hardware/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>IMSAI SIO</title>
+      <link>/tags/imsai-sio/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/tags/imsai-sio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NewCard</title>
+      <link>/tags/newcard/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/tags/newcard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>S100 SIO</title>
+      <link>/tags/s100-sio/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/tags/s100-sio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SerialCard</title>
+      <link>/tags/serialcard/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/tags/serialcard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>8080Assembler</title>
+      <link>/tags/8080assembler/</link>
+      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/8080assembler/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Software</title>
+      <link>/tags/software/</link>
+      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/software/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Debugging</title>
+      <link>/tags/debugging/</link>
+      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
+      
+      <guid>/tags/debugging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>RS232</title>
+      <link>/tags/rs232/</link>
+      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
+      
+      <guid>/tags/rs232/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
