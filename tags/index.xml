@@ -6,24 +6,42 @@
     <description>Recent content in Tags on The IMSAI Gang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 27 Aug 2019 12:23:09 -0400</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Floppy</title>
-      <link>/tags/floppy/</link>
-      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      <title>8080 Emulator</title>
+      <link>/tags/8080-emulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
       
-      <guid>/tags/floppy/</guid>
+      <guid>/tags/8080-emulator/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>8080 Simulator</title>
+      <link>/tags/8080-simulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/8080-simulator/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Software</title>
+      <link>/tags/software/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/software/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Hardware</title>
       <link>/tags/hardware/</link>
-      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
       
       <guid>/tags/hardware/</guid>
       <description></description>
@@ -75,29 +93,11 @@
     </item>
     
     <item>
-      <title>Software</title>
-      <link>/tags/software/</link>
-      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      <title>MMU</title>
+      <link>/tags/mmu/</link>
+      <pubDate>Fri, 01 Mar 2019 12:08:13 -0500</pubDate>
       
-      <guid>/tags/software/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Debugging</title>
-      <link>/tags/debugging/</link>
-      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
-      
-      <guid>/tags/debugging/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>RS232</title>
-      <link>/tags/rs232/</link>
-      <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
-      
-      <guid>/tags/rs232/</guid>
+      <guid>/tags/mmu/</guid>
       <description></description>
     </item>
     

@@ -87,7 +87,7 @@ Flex rules
 <p>On the software side, to build an operating system, we will definitly need a compiler and an assembler.
 As the assembler is the simpler task of the two, we decided to start with this.</p>
 
-<p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm" target="_blank">Github repository</a></p>
+<p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
 
 <h1 id="lexer-tokenizer">Lexer / Tokenizer<a href="#lexer-tokenizer" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 
@@ -149,7 +149,7 @@ int yyerror(const char* msg)
 <h2 id="first-pass">First Pass<a href="#first-pass" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>the goal of the first pass is to generate the symbol table, as well as identify every instruction (Also detecting illegal instructions) as well as its respective arguments. However, due to the fact we are creating symbol table in this pass, thus we can not detect references to invalid labels (yet).
-Below is a sample program <a href="/posts/first_program/" target="_blank">fib.s</a>.
+Below is a sample program <a href="/posts/first_program/">fib.s</a>.
 <details><summary>Output After First Pass 1</summary></p>
 
 <pre><code>(D[1]): .org (ADDR 0x0) 
@@ -231,7 +231,7 @@ to the final output of the progarm, the missing step is to backfill the label re
 				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>New SIO Compatable Serial Card</span>
 			</a>
 			<a class="prev-post" href="/posts/imsai_sio_debugging/">
-				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>IMSAI SIO(Serial I/O) Card Debugging</span>
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>IMSAI SIO Card Debugging</span>
 			</a>
 		</div>
 		<div id="comments" class="thin">

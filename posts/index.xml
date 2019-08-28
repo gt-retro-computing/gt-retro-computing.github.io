@@ -5,22 +5,45 @@
 		<description>Recent content in Posts on The IMSAI Gang</description>
 		<generator>Hugo -- gohugo.io</generator>
 		<language>en-us</language>
-		<lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+		<lastBuildDate>Tue, 27 Aug 2019 12:23:09 -0400</lastBuildDate>
 		<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
 		
 		<item>
-			<title>Take a First Spin at the 8 Inch Floppy</title>
-			<link>/posts/8_inch_floppy_first_spin/</link>
-			<pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+			<title>GWEMU - Intel 8080 Emulator</title>
+			<link>/posts/gwemu_emulator/</link>
+			<pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
 			
-			<guid>/posts/8_inch_floppy_first_spin/</guid>
-			<description>On Friday of last week, we finally got our hands on our first 8&amp;rdquo; floppy disk. We have plaied with the drive a lot earlier on, but since we had no disk, we never got to try the actual read and write function of the disk drives. In short this is one of those debugging where we had very &amp;ldquo;good luck&amp;rdquo;. In essense we encountered nearly 0 problem. Basically everything worked according to the Manual.</description>
-			<content type="html"><![CDATA[<p>On Friday of last week, we finally got our hands on our first 8&rdquo; floppy disk.
-We have plaied with the drive a lot earlier on, but since we had no disk, we
-never got to try the actual read and write function of the disk drives. In short
-this is one of those debugging where we had very &ldquo;good luck&rdquo;. In essense we
-encountered nearly 0 problem. Basically everything worked according to the Manual.
-Which is written for our Tarbell Floppy Disk Interface.</p>
+			<guid>/posts/gwemu_emulator/</guid>
+			<description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
+			<content type="html"><![CDATA[
+
+<h2 id="why-write-another-emulator">Why write another emulator</h2>
+
+<p>If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.</p>
+
+<h2 id="introducing-the-gwemu">Introducing the GWEMU</h2>
+
+<p><a href="https://github.com/gt-retro-computing/i8080-sim">GitHub Project URL</a></p>
+
+<p>Writing this emulator the biggest challenge is probably figuring out how to create a decent looking GUI, as I have no exprience in C/C++ GUI programming. After seeing one of my friend drown in Qt land, I decided to try something different: GTK+ 3. This is a very popular X11 based UI framework, it should be cross-platform (Well at least on mac, I think it also works on windows but your milage may vary).</p>
+
+<blockquote>
+<p>Sidenote: It&rsquo;s kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
+</blockquote>
+
+<p>GTK offered a UI deisgn suite called <code>glade</code> which greatly simplify the process of creating UI. The tool itself is pretty much drag and drop. Although it requires some tinkering to get fully working, compare to writing coding that layout the UI this is not much to complain about.</p>
+
+<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI" /></p>
+
+<p>The UI ended up looking like the picture above. There&rsquo;s not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
+
+<h2 id="todo-items">TODO Items</h2>
+
+<ul>
+<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can&rsquo;t really read binary)</li>
+<li>Disassembler for current instruction. (This might be helpful for debugging unknown program or just helps tracing)</li>
+</ul>
 ]]></content>
 		</item>
 		
@@ -30,19 +53,8 @@ Which is written for our Tarbell Floppy Disk Interface.</p>
 			<pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
 			
 			<guid>/posts/new_sio_compatable_serial_card/</guid>
-			<description>Update 2019-April-22: This totally did not work out the way I intended to. This post is here to document the process of how NOT to design a I/O port card with MCU on the S100 Bus. Please read the post about debuggin the original serial card if you are curious about how our USART works. (or a potential post about the repair. Long story short, we got the orignal serial card working after spending a crap load of effort on debugging the 72MHz ARM Processor not being &amp;ldquo;fast engough&amp;rdquo; to catch the OUT data.</description>
+			<description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
 			<content type="html"><![CDATA[
-
-<blockquote>
-<p>Update 2019-April-22: This totally did not work out the way I
-intended to. This post is here to document the process of how <strong>NOT</strong>
-to design a I/O port card with MCU on the S100 Bus.
-Please read the post about debuggin the original serial card if you are
-curious about how our USART works. (or a potential post about the repair.
-Long story short, we got the orignal serial card working after spending
-a crap load of effort on debugging the 72MHz ARM Processor not being
-&ldquo;fast engough&rdquo; to catch the OUT data.)</p>
-</blockquote>
 
 <p>Although the system we have does include an original IMSAI SIO-2 card,
 which includes 2 RS-232 compatable serial interface. However, we are unable
@@ -138,7 +150,7 @@ Flex rules
 <p>On the software side, to build an operating system, we will definitly need a compiler and an assembler.
 As the assembler is the simpler task of the two, we decided to start with this.</p>
 
-<p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm" target="_blank">Github repository</a></p>
+<p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
 
 <h1 id="lexer-tokenizer">Lexer / Tokenizer</h1>
 
@@ -200,7 +212,7 @@ int yyerror(const char* msg)
 <h2 id="first-pass">First Pass</h2>
 
 <p>the goal of the first pass is to generate the symbol table, as well as identify every instruction (Also detecting illegal instructions) as well as its respective arguments. However, due to the fact we are creating symbol table in this pass, thus we can not detect references to invalid labels (yet).
-Below is a sample program <a href="/posts/first_program/" target="_blank">fib.s</a>.
+Below is a sample program <a href="/posts/first_program/">fib.s</a>.
 <details><summary>Output After First Pass 1</summary></p>
 
 <pre><code>(D[1]): .org (ADDR 0x0) 
@@ -269,14 +281,13 @@ to the final output of the progarm, the missing step is to backfill the label re
 		</item>
 		
 		<item>
-			<title>IMSAI SIO(Serial I/O) Card Debugging</title>
+			<title>IMSAI SIO Card Debugging</title>
 			<link>/posts/imsai_sio_debugging/</link>
 			<pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
 			
 			<guid>/posts/imsai_sio_debugging/</guid>
 			<description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
-Debugging and Repair // TODO
-ECHO Code The following code was takne from The Retro Wagon</description>
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual.</description>
 			<content type="html"><![CDATA[
 
 <h1 id="status-finding-issue">Status: Finding Issue</h1>
@@ -287,55 +298,68 @@ steps we took to debug and repair the card. Simply following the directions from
 the manual did not give us the expected result, thus this post will be quite
 long.</p>
 
-<h1 id="debugging-and-repair">Debugging and Repair</h1>
+<h1 id="troubleshooting">Troubleshooting</h1>
 
-<p>// TODO</p>
+<h2 id="naive-attempt-at-the-example-give-from-the-original-imsai-manual">Naive attempt at the example give from the original IMSAI Manual.</h2>
 
-<h1 id="echo-code">ECHO Code</h1>
+<pre><code>; jsio.asm jha 8/2/2018 testing sio
+; https://wiki.theretrowagon.com/wiki/Imsai_8080
+; Originally from a Monitor program code by John Garza hence the EQUates
+; http://jgarza.sdf.org/files/M72.ASM
+;
+; Important init code from VCF forums
+; handy VCF threads for configuration
+; http://www.vcfed.org/forum/showthread.php?64964-Imsai-FIF-FDC-project
+; http://www.vcfed.org/forum/showthread.php?37137-How-to-get-output-from-SIO-with-Intel-8251A-USART
+;
+; uses a straight through cable.
 
-<p>The following code was takne from
-<a href="https://wiki.theretrowagon.com/wiki/Imsai_8080" target="_blank">The Retro Wagon</a></p>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">LEDS</span>	<span class="no">equ</span>	<span class="mi">0</span><span class="no">FFh</span>	<span class="c">;IMSAI front panel output LEDs (top left)
-</span><span class="c"></span><span class="no">SWCH</span>	<span class="no">equ</span>	<span class="mi">0</span><span class="no">FFh</span>	<span class="c">;IMSAI front panel input switches (left)
-</span><span class="c"></span>
-<span class="c">; channel a
-</span><span class="c"></span><span class="nf">TTS</span>     <span class="no">equ</span>     <span class="mi">03</span><span class="no">h</span>     <span class="c">;SIO channel A command port
-</span><span class="c"></span><span class="no">TTI</span>     <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;SIO channel A data port (yes input=output)
-</span><span class="c"></span><span class="no">TTO</span>     <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;SIO channel A data port
-</span><span class="c"></span>
-<span class="c">; channel b
-</span><span class="c">;TTS     equ     05h     ;SIO channel B command port
-</span><span class="c">;TTI     equ     04h     ;SIO channel B data port (yes input=output)
-</span><span class="c">;TTO     equ     04h     ;SIO channel B data port
-</span><span class="c"></span>
-<span class="nf">TTYDA</span>   <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;tty data available (ready to receive?)
-</span><span class="c"></span><span class="no">TTYTR</span>   <span class="no">equ</span>     <span class="mi">01</span><span class="no">h</span>     <span class="c">;tty terminal ready (ready to transmit?)
-</span><span class="c"></span>
-    <span class="nf">org</span> <span class="mi">0000</span><span class="no">h</span>
-<span class="nl">init:</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">0</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">040</span><span class="no">h</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">04</span><span class="no">eh</span>  <span class="c">; 8,1,n
-</span><span class="c"></span>    <span class="no">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">037</span><span class="no">h</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
+;------------------
+;IMSAI 8080 EQUATES
 
-<span class="nl">inout:</span>               <span class="c">; loop read from serial, write it to serial. Serial terminal echo.
-</span><span class="c"></span>    <span class="nf">in</span> <span class="no">TTS</span>
-    <span class="nf">ani</span> <span class="no">TTYDA</span>        <span class="c">; DATA available?
-</span><span class="c"></span>    <span class="no">jz</span> <span class="no">inout</span>
-<span class="nl">io1:</span>
-    <span class="nf">in</span> <span class="no">TTS</span>
-<span class="nf">ani</span> <span class="no">TTYTR</span>           <span class="c">; ready to receive?
-</span><span class="c"></span>    <span class="no">jz</span> <span class="no">io1</span>
-    <span class="nf">in</span> <span class="no">TTO</span>          <span class="c">; read character
-</span><span class="c"></span>    <span class="no">out</span> <span class="no">TTO</span>         <span class="c">; write
-</span><span class="c"></span>    <span class="no">jmp</span> <span class="no">inout</span>       <span class="c">; repeat
-</span><span class="c"></span>    <span class="no">end</span></code></pre></div>]]></content>
+LEDS	equ	0FFh	;IMSAI front panel output LEDs (top left)
+SWCH	equ	0FFh	;IMSAI front panel input switches (left)
+
+; channel a
+TTS     equ     03h     ;SIO channel A command port
+TTI     equ     02h     ;SIO channel A data port (yes input=output)
+TTO     equ     02h     ;SIO channel A data port
+
+; channel b
+;TTS     equ     05h     ;SIO channel B command port
+;TTI     equ     04h     ;SIO channel B data port (yes input=output)
+;TTO     equ     04h     ;SIO channel B data port
+
+TTYDA   equ     02h     ;tty data available (ready to receive?)
+TTYTR   equ     01h     ;tty terminal ready (ready to transmit?)
+
+    org 0000h
+init:
+    mvi a,0
+    out TTS
+    out TTS
+    out TTS
+    mvi a,040h
+    out TTS
+    mvi a,04eh  ; 8,1,n
+    out TTS
+    mvi a,037h
+    out TTS
+
+inout:               ; loop read from serial, write it to serial. Serial terminal echo.
+    in TTS
+    ani TTYDA        ; DATA available?
+    jz inout
+io1:
+    in TTS
+ani TTYTR           ; ready to receive?
+    jz io1
+    in TTO          ; read character
+    out TTO         ; write
+    jmp inout       ; repeat
+    end
+</code></pre>
+]]></content>
 		</item>
 		
 		<item>
@@ -353,7 +377,7 @@ long.</p>
 
 <p>As part of the project goal is to get this IMSAI to run a modern operating system with
 preemptive multitasking capabilities. A crucial component that is currently missing is the
-<a href="https://en.wikipedia.org/wiki/Memory_management_unit" target="_blank">Memory Management Unit</a><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. Having
+<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. Having
 the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;.
 This is great solution for multiple programs competing for the same blocks of memory.
 In modern processors, the MMU is built as part of the CPU&rsquo;s architecture, so there are
@@ -392,7 +416,7 @@ The 4 bit register file contains read/write protection bits when operate in prot
  <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
 <li id="fn:3">Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page.
  <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
-<li id="fn:4"><a href="https://en.wikipedia.org/wiki/Memory_protection" target="_blank">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring" target="_blank">protection ring</a>.
+<li id="fn:4"><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>.
  <a class="footnote-return" href="#fnref:4"><sup>[return]</sup></a></li>
 </ol>
 </div>
@@ -432,7 +456,7 @@ selected are 74HC595 (Serial to Parallel (Used for Output)) and 74HC165
 
 <h1 id="schematics">Schematics</h1>
 
-<p>The <a href="https://github.com/gt-retro-computing/S100-Memory-Dumper-PCB" target="_blank">PCB Design Files</a>
+<p>The <a href="https://github.com/gt-retro-computing/S100-Memory-Dumper-PCB">PCB Design Files</a>
 are located on Github under S100MemoryDumper-PCB. The board is designed with
 Altium Designer 19. To provide easier and broder access, the exported Gerber
 files are located under the releases tab.</p>
