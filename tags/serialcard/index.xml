@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>SerialCard on The IMSAI Gang</title>
@@ -17,7 +17,7 @@
       <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
       
       <guid>/posts/new_sio_compatable_serial_card/</guid>
-      <description>Update 2019-April-22: This totally did not work out the way I intended to. This post is here to document the process of how NOT to design a I/O port card with MCU on the S100 Bus. Please read the post about debuggin the original serial card if you are curious about how our USART works. (or a potential post about the repair. Long story short, we got the orignal serial card working after spending a crap load of effort on debugging the 72MHz ARM Processor not being &amp;ldquo;fast engough&amp;rdquo; to catch the OUT data.</description>
+      <description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
     </item>
     
   </channel>

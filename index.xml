@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>The IMSAI Gang</title>
@@ -6,18 +6,29 @@
     <description>Recent content on The IMSAI Gang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 22 Apr 2019 09:21:49 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Take a First Spin at the 8 Inch Floppy</title>
-      <link>/posts/8_inch_floppy_first_spin/</link>
-      <pubDate>Mon, 22 Apr 2019 09:21:49 -0400</pubDate>
+      <title>CP/M 2.2 from scratch</title>
+      <link>/posts/cpm-boot-up/</link>
+      <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
       
-      <guid>/posts/8_inch_floppy_first_spin/</guid>
-      <description>On Friday of last week, we finally got our hands on our first 8&amp;rdquo; floppy disk. We have plaied with the drive a lot earlier on, but since we had no disk, we never got to try the actual read and write function of the disk drives. In short this is one of those debugging where we had very &amp;ldquo;good luck&amp;rdquo;. In essense we encountered nearly 0 problem. Basically everything worked according to the Manual.</description>
+      <guid>/posts/cpm-boot-up/</guid>
+      <description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
+Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+    </item>
+    
+    <item>
+      <title>GWEMU - Intel 8080 Emulator</title>
+      <link>/posts/gwemu_emulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/gwemu_emulator/</guid>
+      <description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
     </item>
     
     <item>
@@ -26,7 +37,7 @@
       <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
       
       <guid>/posts/new_sio_compatable_serial_card/</guid>
-      <description>Update 2019-April-22: This totally did not work out the way I intended to. This post is here to document the process of how NOT to design a I/O port card with MCU on the S100 Bus. Please read the post about debuggin the original serial card if you are curious about how our USART works. (or a potential post about the repair. Long story short, we got the orignal serial card working after spending a crap load of effort on debugging the 72MHz ARM Processor not being &amp;ldquo;fast engough&amp;rdquo; to catch the OUT data.</description>
+      <description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
     </item>
     
     <item>
@@ -43,14 +54,13 @@ Flex rules
     </item>
     
     <item>
-      <title>IMSAI SIO(Serial I/O) Card Debugging</title>
+      <title>IMSAI SIO Card Debugging</title>
       <link>/posts/imsai_sio_debugging/</link>
       <pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
       
       <guid>/posts/imsai_sio_debugging/</guid>
       <description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
-Debugging and Repair // TODO
-ECHO Code The following code was takne from The Retro Wagon</description>
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual.</description>
     </item>
     
     <item>

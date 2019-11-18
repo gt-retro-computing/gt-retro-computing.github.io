@@ -5,33 +5,29 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-<meta itemprop="name" content="IMSAI SIO(Serial I/O) Card Debugging">
+<meta itemprop="name" content="IMSAI SIO Card Debugging">
 <meta itemprop="description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
-Debugging and Repair // TODO
-ECHO Code The following code was takne from The Retro Wagon">
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual.">
 
 
 <meta itemprop="datePublished" content="2019-03-12T13:21:53-04:00" />
 <meta itemprop="dateModified" content="2019-03-12T13:21:53-04:00" />
-<meta itemprop="wordCount" content="243">
+<meta itemprop="wordCount" content="291">
 
 
 
-<meta itemprop="keywords" content="IMSAI SIO,Hardware,S100 SIO,Debugging,UART,RS232," />
-<meta property="og:title" content="IMSAI SIO(Serial I/O) Card Debugging" />
+<meta itemprop="keywords" content="" />
+<meta property="og:title" content="IMSAI SIO Card Debugging" />
 <meta property="og:description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
-Debugging and Repair // TODO
-ECHO Code The following code was takne from The Retro Wagon" />
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/posts/imsai_sio_debugging/" />
-<meta property="article:published_time" content="2019-03-12T13:21:53-04:00"/>
-<meta property="article:modified_time" content="2019-03-12T13:21:53-04:00"/>
+<meta property="article:published_time" content="2019-03-12T13:21:53-04:00" />
+<meta property="article:modified_time" content="2019-03-12T13:21:53-04:00" />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="IMSAI SIO(Serial I/O) Card Debugging"/>
+<meta name="twitter:title" content="IMSAI SIO Card Debugging"/>
 <meta name="twitter:description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
-Debugging and Repair // TODO
-ECHO Code The following code was takne from The Retro Wagon"/>
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -40,8 +36,8 @@ ECHO Code The following code was takne from The Retro Wagon"/>
 	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
 	<link rel="shortcut icon" href="/favicon.ico">
 
-	<title>IMSAI SIO(Serial I/O) Card Debugging</title>
-	<link rel="stylesheet" href="/css/style.min.ec3c6280e622d1d53e8d6f729d5e1e55acd074988dc37023b7533cd3ecde8cc5.css" integrity="sha256-7DxigOYi0dU+jW9ynV4eVazQdJiNw3Ajt1M80+zejMU=">
+	<title>IMSAI SIO Card Debugging</title>
+	<link rel="stylesheet" href="/css/style.min.15be78c7847d8af2b8351985fd6613d6cf4da1a0ab48531151a9c38969ebd44a.css" integrity="sha256-Fb54x4R9ivK4NRmF/WYT1s9NoaCrSFMRUanDiWnr1Eo=">
 	
 </head>
 
@@ -73,7 +69,7 @@ ECHO Code The following code was takne from The Retro Wagon"/>
 		<article class="thin">
 			<header class="post-header">
 				<div class="post-meta"><span>Mar 12, 2019</span></div>
-				<h1>IMSAI SIO(Serial I/O) Card Debugging</h1>
+				<h1>IMSAI SIO Card Debugging</h1>
 			</header>
 			<div class="content">
 				
@@ -86,63 +82,73 @@ steps we took to debug and repair the card. Simply following the directions from
 the manual did not give us the expected result, thus this post will be quite
 long.</p>
 
-<h1 id="debugging-and-repair">Debugging and Repair<a href="#debugging-and-repair" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<h1 id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 
-<p>// TODO</p>
+<h2 id="naive-attempt-at-the-example-give-from-the-original-imsai-manual">Naive attempt at the example give from the original IMSAI Manual.<a href="#naive-attempt-at-the-example-give-from-the-original-imsai-manual" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
-<h1 id="echo-code">ECHO Code<a href="#echo-code" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<pre><code>; jsio.asm jha 8/2/2018 testing sio
+; https://wiki.theretrowagon.com/wiki/Imsai_8080
+; Originally from a Monitor program code by John Garza hence the EQUates
+; http://jgarza.sdf.org/files/M72.ASM
+;
+; Important init code from VCF forums
+; handy VCF threads for configuration
+; http://www.vcfed.org/forum/showthread.php?64964-Imsai-FIF-FDC-project
+; http://www.vcfed.org/forum/showthread.php?37137-How-to-get-output-from-SIO-with-Intel-8251A-USART
+;
+; uses a straight through cable.
 
-<p>The following code was takne from
-<a href="https://wiki.theretrowagon.com/wiki/Imsai_8080" target="_blank">The Retro Wagon</a></p>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">LEDS</span>	<span class="no">equ</span>	<span class="mi">0</span><span class="no">FFh</span>	<span class="c">;IMSAI front panel output LEDs (top left)
-</span><span class="c"></span><span class="no">SWCH</span>	<span class="no">equ</span>	<span class="mi">0</span><span class="no">FFh</span>	<span class="c">;IMSAI front panel input switches (left)
-</span><span class="c"></span>
-<span class="c">; channel a
-</span><span class="c"></span><span class="nf">TTS</span>     <span class="no">equ</span>     <span class="mi">03</span><span class="no">h</span>     <span class="c">;SIO channel A command port
-</span><span class="c"></span><span class="no">TTI</span>     <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;SIO channel A data port (yes input=output)
-</span><span class="c"></span><span class="no">TTO</span>     <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;SIO channel A data port
-</span><span class="c"></span>
-<span class="c">; channel b
-</span><span class="c">;TTS     equ     05h     ;SIO channel B command port
-</span><span class="c">;TTI     equ     04h     ;SIO channel B data port (yes input=output)
-</span><span class="c">;TTO     equ     04h     ;SIO channel B data port
-</span><span class="c"></span>
-<span class="nf">TTYDA</span>   <span class="no">equ</span>     <span class="mi">02</span><span class="no">h</span>     <span class="c">;tty data available (ready to receive?)
-</span><span class="c"></span><span class="no">TTYTR</span>   <span class="no">equ</span>     <span class="mi">01</span><span class="no">h</span>     <span class="c">;tty terminal ready (ready to transmit?)
-</span><span class="c"></span>
-    <span class="nf">org</span> <span class="mi">0000</span><span class="no">h</span>
-<span class="nl">init:</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">0</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">040</span><span class="no">h</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">04</span><span class="no">eh</span>  <span class="c">; 8,1,n
-</span><span class="c"></span>    <span class="no">out</span> <span class="no">TTS</span>
-    <span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span><span class="mi">037</span><span class="no">h</span>
-    <span class="nf">out</span> <span class="no">TTS</span>
+;------------------
+;IMSAI 8080 EQUATES
 
-<span class="nl">inout:</span>               <span class="c">; loop read from serial, write it to serial. Serial terminal echo.
-</span><span class="c"></span>    <span class="nf">in</span> <span class="no">TTS</span>
-    <span class="nf">ani</span> <span class="no">TTYDA</span>        <span class="c">; DATA available?
-</span><span class="c"></span>    <span class="no">jz</span> <span class="no">inout</span>
-<span class="nl">io1:</span>
-    <span class="nf">in</span> <span class="no">TTS</span>
-<span class="nf">ani</span> <span class="no">TTYTR</span>           <span class="c">; ready to receive?
-</span><span class="c"></span>    <span class="no">jz</span> <span class="no">io1</span>
-    <span class="nf">in</span> <span class="no">TTO</span>          <span class="c">; read character
-</span><span class="c"></span>    <span class="no">out</span> <span class="no">TTO</span>         <span class="c">; write
-</span><span class="c"></span>    <span class="no">jmp</span> <span class="no">inout</span>       <span class="c">; repeat
-</span><span class="c"></span>    <span class="no">end</span></code></pre></div>
+LEDS	equ	0FFh	;IMSAI front panel output LEDs (top left)
+SWCH	equ	0FFh	;IMSAI front panel input switches (left)
+
+; channel a
+TTS     equ     03h     ;SIO channel A command port
+TTI     equ     02h     ;SIO channel A data port (yes input=output)
+TTO     equ     02h     ;SIO channel A data port
+
+; channel b
+;TTS     equ     05h     ;SIO channel B command port
+;TTI     equ     04h     ;SIO channel B data port (yes input=output)
+;TTO     equ     04h     ;SIO channel B data port
+
+TTYDA   equ     02h     ;tty data available (ready to receive?)
+TTYTR   equ     01h     ;tty terminal ready (ready to transmit?)
+
+    org 0000h
+init:
+    mvi a,0
+    out TTS
+    out TTS
+    out TTS
+    mvi a,040h
+    out TTS
+    mvi a,04eh  ; 8,1,n
+    out TTS
+    mvi a,037h
+    out TTS
+
+inout:               ; loop read from serial, write it to serial. Serial terminal echo.
+    in TTS
+    ani TTYDA        ; DATA available?
+    jz inout
+io1:
+    in TTS
+ani TTYTR           ; ready to receive?
+    jz io1
+    in TTO          ; read character
+    out TTO         ; write
+    jmp inout       ; repeat
+    end
+</code></pre>
+
 			</div>
 			<hr class="post-end">
 			<footer class="post-info">
 				<p>Author: </p>
-				<p>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/imsai-sio">IMSAI SIO</a></span><span class="tag"><a href="/tags/hardware">Hardware</a></span><span class="tag"><a href="/tags/s100-sio">S100 SIO</a></span><span class="tag"><a href="/tags/debugging">Debugging</a></span><span class="tag"><a href="/tags/uart">UART</a></span><span class="tag"><a href="/tags/rs232">RS232</a></span>
-				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>243 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>291 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-03-12</p>
 			</footer>
 		</article>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Software on The IMSAI Gang</title>
@@ -6,10 +6,30 @@
     <description>Recent content in Software on The IMSAI Gang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 02 Apr 2019 12:23:09 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate>
     
 	<atom:link href="/tags/software/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CP/M 2.2 from scratch</title>
+      <link>/posts/cpm-boot-up/</link>
+      <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/cpm-boot-up/</guid>
+      <description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
+Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+    </item>
+    
+    <item>
+      <title>GWEMU - Intel 8080 Emulator</title>
+      <link>/posts/gwemu_emulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/gwemu_emulator/</guid>
+      <description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
+    </item>
     
     <item>
       <title>GWASM - The 8080 Assembler</title>
