@@ -6,17 +6,12 @@
     <description>Recent content on The IMSAI Gang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-<<<<<<< HEAD
     <lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate>
-=======
-    <lastBuildDate>Tue, 27 Aug 2019 12:23:09 -0400</lastBuildDate>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-<<<<<<< HEAD
       <title>CP/M 2.2 from scratch</title>
       <link>/posts/cpm-boot-up/</link>
       <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
@@ -31,12 +26,6 @@ Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to 
       <link>/posts/gwemu_emulator/</link>
       <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
       
-=======
-      <title>GWEMU - Intel 8080 Emulator</title>
-      <link>/posts/gwemu_emulator/</link>
-      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
-      
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
       <guid>/posts/gwemu_emulator/</guid>
       <description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
 Introducing the GWEMU GitHub Project URL</description>

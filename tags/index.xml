@@ -6,60 +6,24 @@
     <description>Recent content in Tags on The IMSAI Gang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-<<<<<<< HEAD
     <lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate>
-=======
-    <lastBuildDate>Tue, 27 Aug 2019 12:23:09 -0400</lastBuildDate>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-<<<<<<< HEAD
       <title>CP/M</title>
       <link>/tags/cp/m/</link>
       <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
       
       <guid>/tags/cp/m/</guid>
-=======
-      <title>8080 Emulator</title>
-      <link>/tags/8080-emulator/</link>
-      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
-      
-      <guid>/tags/8080-emulator/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>8080 Simulator</title>
-      <link>/tags/8080-simulator/</link>
-      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
-      
-      <guid>/tags/8080-simulator/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Software</title>
-      <link>/tags/software/</link>
-      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
-      
-      <guid>/tags/software/</guid>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
-      <description></description>
-    </item>
-    
-    <item>
-<<<<<<< HEAD
       <title>OS</title>
       <link>/tags/os/</link>
       <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
-=======
-      <title>Hardware</title>
-      <link>/tags/hardware/</link>
-      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
       
       <guid>/tags/os/</guid>
       <description></description>
@@ -111,7 +75,6 @@
     </item>
     
     <item>
-<<<<<<< HEAD
       <title>NewCard</title>
       <link>/tags/newcard/</link>
       <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
@@ -135,13 +98,6 @@
       <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
       
       <guid>/tags/serialcard/</guid>
-=======
-      <title>MMU</title>
-      <link>/tags/mmu/</link>
-      <pubDate>Fri, 01 Mar 2019 12:08:13 -0500</pubDate>
-      
-      <guid>/tags/mmu/</guid>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
       <description></description>
     </item>
     

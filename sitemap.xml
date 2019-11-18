@@ -3,7 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-<<<<<<< HEAD
     <loc>/tags/cp/m/</loc>
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
   </url>
@@ -16,57 +15,25 @@
   <url>
     <loc>/tags/os/</loc>
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
-=======
-    <loc>/tags/8080-emulator/</loc>
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/tags/8080-simulator/</loc>
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
-  </url>
-  
-  <url>
-    <loc>/posts/gwemu_emulator/</loc>
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
   </url>
   
   <url>
     <loc>/posts/</loc>
-<<<<<<< HEAD
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
-=======
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
   </url>
   
   <url>
     <loc>/tags/software/</loc>
-<<<<<<< HEAD
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
-=======
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
   </url>
   
   <url>
     <loc>/tags/</loc>
-<<<<<<< HEAD
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
-=======
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
   </url>
   
   <url>
     <loc>/</loc>
-<<<<<<< HEAD
     <lastmod>2019-10-05T12:23:09-04:00</lastmod>
   </url>
   
@@ -83,19 +50,11 @@
   <url>
     <loc>/posts/gwemu_emulator/</loc>
     <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-=======
-    <lastmod>2019-08-27T12:23:09-04:00</lastmod>
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
   </url>
   
   <url>
     <loc>/tags/hardware/</loc>
     <lastmod>2019-04-03T22:27:06-04:00</lastmod>
-<<<<<<< HEAD
-=======
-    <priority>0</priority>
->>>>>>> 8267da1284bdcf227856780d1cd545df350c10d3
   </url>
   
   <url>
