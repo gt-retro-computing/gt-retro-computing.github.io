@@ -5,8 +5,57 @@
 		<description>Recent content in Posts on The IMSAI Gang</description>
 		<generator>Hugo -- gohugo.io</generator>
 		<language>en-us</language>
-		<lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate>
+		<lastBuildDate>Wed, 27 Nov 2019 00:00:00 -0400</lastBuildDate>
 		<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Tarbell MD1101 SSSD Floppy Controller</title>
+			<link>/posts/tarbell_md1101/</link>
+			<pubDate>Wed, 27 Nov 2019 00:00:00 -0400</pubDate>
+			
+			<guid>/posts/tarbell_md1101/</guid>
+			<description>MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&amp;rdquo; floppy drives.
+ The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run.</description>
+			<content type="html"><![CDATA[
+
+<h1 id="md1101">MD1101</h1>
+
+<p>Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.</p>
+
+<blockquote>
+<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <br>
+The interface ran at the standard speed of 250,000 bits per second, and the normal formatted capacity per diskette of 256 kilobytes. Places for two connectors were provided on the board.</p>
+</blockquote>
+
+<h1 id="documentation-typo">Documentation Typo</h1>
+
+<p>The WD1771 chip used by the card actually does not support multi-drive configuration. The card used a 74LS175 Quad D Flip-Flop to select between up to four drives. Drive select only use 2 of the 4 bits in the flip-flop, the other 2 seems to be releatively undocumented. However, the provided sample code for selecting drive would not work. It would cause any subsquent input from the controller to hang the CPU. (Stuck in <code>IN DWAIT</code>)</p>
+
+<p>After a lot of trail and error along with reading the tiny text schematics, we are able to narrow the problem downto that the code is incorrectly setting one of the bit on the Flip Flop. Effectively disabling the controller interrupt request handling thus causing it to hang forever.</p>
+
+<h2 id="modified-code-listing">Modified Code Listing</h2>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nl">SELECT_DIRVE:</span>
+<span class="c">;Select drive in register C
+</span><span class="c"></span><span class="nf">MOV</span> <span class="no">A</span><span class="p">,</span> <span class="no">C</span> <span class="c">; Move drive number to A
+</span><span class="c"></span><span class="no">CMA</span>
+<span class="nf">ANI</span> <span class="mi">3</span> <span class="c">;Limit drive selection to only 0-3
+</span><span class="c"></span><span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span> <span class="c">;shift left by 4
+</span><span class="c"></span><span class="no">ORI</span> <span class="mi">0x82</span> <span class="c">;MODIFIED: original is 0x2
+</span><span class="c"></span><span class="no">OUT</span> <span class="no">DEXT</span>
+<span class="nf">RET</span> <span class="c">;return from subroutine
+</span><span class="c"></span><span class="p">---</span></code></pre></div>
+<h1 id="5-25-drive-mod">5.25&rdquo; Drive Mod</h1>
+
+<p>In addition to the 8&rdquo; drives, we also happen to have a few 5.25&rdquo;
+drive on hand. that we would like to operate as well. Upon close inspection, the 5.25&rdquo; and 8&rdquo; (Shugart 801) interface are not very different from eachother. The only difference being the 5.25&rdquo; drives has a Motor Enable line in lieu of a Head Load (This is due the the difference in physical construction of the drive.) But I think it is okay to subsitute the signal. Since if achieve the same effect which is to <em>begin</em> reading the diskett. Conviently the board has a free 40 pin mounting hole for a additional 2 8&rdquo; drive. We decided to use this connector for our 5.25&rdquo; drive header. This required a lot of jumper wires (All the blue mod wires below).</p>
+
+<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&quot; mod" />
+<center>MD 1101 board after 5.25&rdquo; mod</center></p>
+
+<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup" />
+<center>Overall Machine Setup</center></p>
+]]></content>
+		</item>
 		
 		<item>
 			<title>CP/M 2.2 from scratch</title>
