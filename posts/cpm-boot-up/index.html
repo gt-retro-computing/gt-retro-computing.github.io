@@ -85,7 +85,9 @@ Getting the CP/M Boot disk With some quick research, it&#39;s not hard to find t
 <h2 id="bootstrap-loader">Bootstrap loader<a href="#bootstrap-loader" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <p>The floppy controller we have right now have a &ldquo;phantom&rdquo; ROM that is able to load the track 1, sector 0 of floppy disk to memory and then execute it. We are going to use this hardware feature now to load a very short program (as one sector is only 128 bytes) that is able to load the rest of CP/M. This will be our COLD_BOOT subroutine.</p>
 <h1 id="demo-time">Demo time!<a href="#demo-time" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-<!-- raw HTML omitted -->
+<center>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/oYCM-KIvgKA" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 <h1 id="improvements-to-be-made">Improvements to be made<a href="#improvements-to-be-made" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <ul>
 <li>Update the loader code to support our &ldquo;new floppy controller&rdquo;</li>

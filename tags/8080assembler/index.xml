@@ -20,7 +20,7 @@
       <description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-%{ #include &amp;ldquo;helpers.h&amp;rdquo; #include &amp;ldquo;parser.h&amp;rdquo; %}</description>
+Flex rules ``` %{ #include &amp;ldquo;helpers.</description>
     </item>
     
   </channel>

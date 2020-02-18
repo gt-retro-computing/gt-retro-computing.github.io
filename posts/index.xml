@@ -19,7 +19,7 @@
 			<content type="html"><![CDATA[<h1 id="md1101">MD1101</h1>
 <p>Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.</p>
 <blockquote>
-<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <!-- raw HTML omitted -->
+<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <br>
 The interface ran at the standard speed of 250,000 bits per second, and the normal formatted capacity per diskette of 256 kilobytes. Places for two connectors were provided on the board.</p>
 </blockquote>
 <h1 id="documentation-typo">Documentation Typo</h1>
@@ -125,10 +125,9 @@ They must be wired to the corresponding &ldquo;Mapped To&rdquo; pins on the 5.25
 </table>
 <h2 id="pictures">Pictures</h2>
 <p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&rdquo; mod"></p>
-<!-- raw HTML omitted -->
+<center>MD 1101 board after 5.25" mod</center>
 <p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup"></p>
-<!-- raw HTML omitted -->
-]]></content>
+<center>Overall Machine Setup</center>]]></content>
 		</item>
 		
 		<item>
@@ -155,7 +154,9 @@ Getting the CP/M Boot disk With some quick research, it&#39;s not hard to find t
 <h2 id="bootstrap-loader">Bootstrap loader</h2>
 <p>The floppy controller we have right now have a &ldquo;phantom&rdquo; ROM that is able to load the track 1, sector 0 of floppy disk to memory and then execute it. We are going to use this hardware feature now to load a very short program (as one sector is only 128 bytes) that is able to load the rest of CP/M. This will be our COLD_BOOT subroutine.</p>
 <h1 id="demo-time">Demo time!</h1>
-<!-- raw HTML omitted -->
+<center>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/oYCM-KIvgKA" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 <h1 id="improvements-to-be-made">Improvements to be made</h1>
 <ul>
 <li>Update the loader code to support our &ldquo;new floppy controller&rdquo;</li>
@@ -244,7 +245,13 @@ continuing.</p>
 <p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction"></p>
 <p>The above image is the Intel 8080 processor executing and OUT instruction to port
 0xFF (The Lights) with data 0xFF.</p>
-<!-- raw HTML omitted -->
+<details><summary>Exact instruction listing.</summary>
+```asm
+CMA ; Complement A, as A is initialized to 0, this makes it 0xFF
+OUT 0xFF ;
+HLT ; HALT is added to assure clean signal capature. The Wait line is used for trigger
+```
+</details>
 <p>As we can see from the logic anaylizer, the address of the port is first written to
 the S100 Bus, then sOUT signal comes HIGH, at this point the address on the bus should
 be a valid OUT PORT address. (This address is duplicated (A0-A7 = A8-A15) on the bus).
@@ -264,13 +271,14 @@ Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LO
 			<description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-%{ #include &amp;ldquo;helpers.h&amp;rdquo; #include &amp;ldquo;parser.h&amp;rdquo; %}</description>
+Flex rules ``` %{ #include &amp;ldquo;helpers.</description>
 			<content type="html"><![CDATA[<p>On the software side, to build an operating system, we will definitly need a compiler and an assembler.
 As the assembler is the simpler task of the two, we decided to start with this.</p>
 <p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
 <h1 id="lexer--tokenizer">Lexer / Tokenizer</h1>
 <p>The first part of any compiler (assembler) is to lex the source language. This is done using flex.</p>
-<!-- raw HTML omitted -->
+<details><summary>Flex rules</summary>
+```
 <p>%{
 #include &ldquo;helpers.h&rdquo;
 #include &ldquo;parser.h&rdquo;
@@ -478,7 +486,7 @@ The 4 bit register file contains read/write protection bits when operate in prot
 <h3 id="known-limitations">Known limitations</h3>
 <h3 id="measurement-of-the-bus-status-during-different-instruction-cycles">Measurement of the BUS status during different instruction cycles</h3>
 <p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1"></p>
-<!-- raw HTML omitted -->
+<center>Scope Screenshot of the TODO cycle</center>
 <section class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
@@ -588,12 +596,14 @@ series and display them one at a time on the front panel led.</p>
 	<span class="nf">mov</span> <span class="no">a</span><span class="p">,</span> <span class="no">h</span>
 	<span class="nf">jmp</span> <span class="no">fib</span>
 </code></pre></div><h1 id="videos">Videos</h1>
-<!-- raw HTML omitted -->
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/9FKPAX2WN8E" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+<center>The above code executed</center>
 <h1 id="original-single-stepped-version">Original Single Stepped version.</h1>
 <p>This is the first <em>actual</em> first program we got working on this machine. There's lots of patching
 thus includes a lot of  <code>NOP</code> and <code>JMP</code> instructions.</p>
-<!-- raw HTML omitted -->
-]]></content>
+<center><iframe width="560" height="315" src="https://www.youtube.com/embed/Uavji8Hw_UQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center> ]]></content>
 		</item>
 		
 		<item>
@@ -632,9 +642,8 @@ This particular one is made in Malaysia 1977.
 On the top right there is an empty socket, which is the for the front panel (CPA) and CPU private
 bus to connect to. Although it looks like a 16 pin socket, in reality the two pins are shorted in
 every column. It only carries an 8-bit signal (data bus) between the front panel and the CPU board.</p>
-<p><!-- raw HTML omitted --><img src="/image/post/powerup/thumb/MPU-A.jpeg" alt="IMSAI MPU-A"><!-- raw HTML omitted --></p>
-<!-- raw HTML omitted -->
-]]></content>
+<p><a href="/image/post/powerup/MPU-A.jpeg" target="_blank"><img src="/image/post/powerup/thumb/MPU-A.jpeg" alt="IMSAI MPU-A"></a></p>
+<center>*The IMSAI MPU* (click for a larger image)</center>]]></content>
 		</item>
 		
 	</channel>

@@ -9,10 +9,10 @@
 <meta itemprop="description" content="On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-%{ #include &ldquo;helpers.h&rdquo; #include &ldquo;parser.h&rdquo; %}">
+Flex rules ``` %{ #include &ldquo;helpers.">
 <meta itemprop="datePublished" content="2019-04-02T12:23:09-04:00" />
 <meta itemprop="dateModified" content="2019-04-02T12:23:09-04:00" />
-<meta itemprop="wordCount" content="560">
+<meta itemprop="wordCount" content="563">
 
 
 
@@ -20,7 +20,7 @@ Lexer / Tokenizer The first part of any compiler (assembler) is to lex the sourc
 <meta property="og:description" content="On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-%{ #include &ldquo;helpers.h&rdquo; #include &ldquo;parser.h&rdquo; %}" />
+Flex rules ``` %{ #include &ldquo;helpers." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/posts/assembler/" />
 <meta property="article:published_time" content="2019-04-02T12:23:09-04:00" />
@@ -30,7 +30,7 @@ Lexer / Tokenizer The first part of any compiler (assembler) is to lex the sourc
 <meta name="twitter:description" content="On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-%{ #include &ldquo;helpers.h&rdquo; #include &ldquo;parser.h&rdquo; %}"/>
+Flex rules ``` %{ #include &ldquo;helpers."/>
 
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -80,7 +80,8 @@ As the assembler is the simpler task of the two, we decided to start with this.<
 <p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
 <h1 id="lexer--tokenizer">Lexer / Tokenizer<a href="#lexer--tokenizer" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <p>The first part of any compiler (assembler) is to lex the source language. This is done using flex.</p>
-<!-- raw HTML omitted -->
+<details><summary>Flex rules</summary>
+```
 <p>%{
 #include &ldquo;helpers.h&rdquo;
 #include &ldquo;parser.h&rdquo;
@@ -187,7 +188,7 @@ to the final output of the progarm, the missing step is to backfill the label re
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/software">Software</a></span><span class="tag"><a href="/tags/8080assembler">8080Assembler</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>560 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>563 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-02</p>
 			</footer>
 		</article>
