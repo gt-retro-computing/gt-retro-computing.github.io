@@ -8,16 +8,13 @@
 <meta itemprop="name" content="Tarbell MD1101 SSSD Floppy Controller">
 <meta itemprop="description" content="MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.
  The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run.">
-
-
 <meta itemprop="datePublished" content="2019-11-27T00:00:00-04:00" />
 <meta itemprop="dateModified" content="2019-11-27T00:00:00-04:00" />
-<meta itemprop="wordCount" content="456">
+<meta itemprop="wordCount" content="538">
 
 
 
-<meta itemprop="keywords" content="Hardware,Floppy," />
-<meta property="og:title" content="Tarbell MD1101 SSSD Floppy Controller" />
+<meta itemprop="keywords" content="Hardware,Floppy," /><meta property="og:title" content="Tarbell MD1101 SSSD Floppy Controller" />
 <meta property="og:description" content="MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.
  The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run." />
 <meta property="og:type" content="article" />
@@ -72,23 +69,15 @@
 				<h1>Tarbell MD1101 SSSD Floppy Controller</h1>
 			</header>
 			<div class="content">
-				
-
-<h1 id="md1101">MD1101<a href="#md1101" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
+				<h1 id="md1101">MD1101<a href="#md1101" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <p>Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.</p>
-
 <blockquote>
-<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <br>
+<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <!-- raw HTML omitted -->
 The interface ran at the standard speed of 250,000 bits per second, and the normal formatted capacity per diskette of 256 kilobytes. Places for two connectors were provided on the board.</p>
 </blockquote>
-
 <h1 id="documentation-typo">Documentation Typo<a href="#documentation-typo" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <p>The WD1771 chip used by the card actually does not support multi-drive configuration. The card used a 74LS175 Quad D Flip-Flop to select between up to four drives. Drive select only use 2 of the 4 bits in the flip-flop, the other 2 seems to be releatively undocumented. However, the provided sample code for selecting drive would not work. It would cause any subsquent input from the controller to hang the CPU. (Stuck in <code>IN DWAIT</code>)</p>
-
 <p>After a lot of trail and error along with reading the tiny text schematics, we are able to narrow the problem downto that the code is incorrectly setting one of the bit on the Flip Flop. Effectively disabling the controller interrupt request handling thus causing it to hang forever.</p>
-
 <h2 id="modified-code-listing">Modified Code Listing<a href="#modified-code-listing" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nl">SELECT_DIRVE:</span>
 <span class="c">;Select drive in register C
@@ -99,26 +88,108 @@ The interface ran at the standard speed of 250,000 bits per second, and the norm
 </span><span class="c"></span><span class="no">ORI</span> <span class="mi">0x82</span> <span class="c">;MODIFIED: original is 0x2
 </span><span class="c"></span><span class="no">OUT</span> <span class="no">DEXT</span>
 <span class="nf">RET</span> <span class="c">;return from subroutine
-</span><span class="c"></span><span class="p">---</span></code></pre></div>
-<h1 id="5-25-drive-mod">5.25&rdquo; Drive Mod<a href="#5-25-drive-mod" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
+</span><span class="c"></span><span class="p">---</span>
+</code></pre></div><h1 id="525-drive-mod">5.25&rdquo; Drive Mod<a href="#525-drive-mod" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <p>In addition to the 8&rdquo; drives, we also happen to have a few 5.25&rdquo;
 drive on hand. that we would like to operate as well. Upon close inspection, the 5.25&rdquo; and 8&rdquo; (Shugart 801) interface are not very different from eachother. The only difference being the 5.25&rdquo; drives has a Motor Enable line in lieu of a Head Load (This is due the the difference in physical construction of the drive.) But I think it is okay to subsitute the signal. Since if achieve the same effect which is to <em>begin</em> reading the diskett. Conviently the board has a free 40 pin mounting hole for a additional 2 8&rdquo; drive. We decided to use this connector for our 5.25&rdquo; drive header. This required a lot of jumper wires (All the blue mod wires below).</p>
-
-<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&quot; mod" />
-<center>MD 1101 board after 5.25&rdquo; mod</center></p>
-
-<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup" />
-<center>Overall Machine Setup</center></p>
+<h2 id="drive-pin-mapping">Drive Pin Mapping<a href="#drive-pin-mapping" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>The pads are labeled across the MD1101 board and are listed with their corresponding name here.
+They must be wired to the corresponding &ldquo;Mapped To&rdquo; pins on the 5.25&rdquo; floppy drive.</p>
+<table>
+<thead>
+<tr>
+<th>Pad</th>
+<th>Name</th>
+<th>Mapped To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E23</td>
+<td>DS0*</td>
+<td>16 (motor en. B)</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>INDX0*</td>
+<td>8 (index)</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>RDY0*</td>
+<td>34 (ready)</td>
+</tr>
+<tr>
+<td>E19</td>
+<td>HLD0*</td>
+<td></td>
+</tr>
+<tr>
+<td>E20</td>
+<td>HLD1*</td>
+<td></td>
+</tr>
+<tr>
+<td>E17</td>
+<td>HLD2*</td>
+<td>12 (drive sel. B)</td>
+</tr>
+<tr>
+<td>E25</td>
+<td>HLD3*</td>
+<td></td>
+</tr>
+<tr>
+<td>E22</td>
+<td>SO*</td>
+<td>18 (direction)</td>
+</tr>
+<tr>
+<td>E21</td>
+<td>SI*</td>
+<td>20 (step)</td>
+</tr>
+<tr>
+<td>E15</td>
+<td>WD*</td>
+<td>22</td>
+</tr>
+<tr>
+<td>E16</td>
+<td>WG*</td>
+<td>24</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>TR00*</td>
+<td>26 (sense track zero)</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>WRPT0*</td>
+<td>28</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>RDAT0*</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pictures">Pictures<a href="#pictures" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&rdquo; mod"></p>
+<!-- raw HTML omitted -->
+<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup"></p>
+<!-- raw HTML omitted -->
 
 			</div>
 			<hr class="post-end">
 			<footer class="post-info">
-				<p>Author: Codetector</p>
+				<p>Author: Codetector, Will Gulian</p>
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/hardware">Hardware</a></span><span class="tag"><a href="/tags/floppy">Floppy</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>456 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>538 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-11-27</p>
 			</footer>
 		</article>
@@ -132,7 +203,7 @@ drive on hand. that we would like to operate as well. Upon close inspection, the
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 <a href="/">the IMSAI Gang</a></p>
+		<p>&copy; 2020 <a href="/">the IMSAI Gang</a></p>
 		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>

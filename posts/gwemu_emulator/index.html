@@ -8,16 +8,13 @@
 <meta itemprop="name" content="GWEMU - Intel 8080 Emulator">
 <meta itemprop="description" content="Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
 Introducing the GWEMU GitHub Project URL">
-
-
 <meta itemprop="datePublished" content="2019-08-27T12:23:09-04:00" />
 <meta itemprop="dateModified" content="2019-08-27T12:23:09-04:00" />
 <meta itemprop="wordCount" content="281">
 
 
 
-<meta itemprop="keywords" content="Software,8080 Emulator,8080 Simulator," />
-<meta property="og:title" content="GWEMU - Intel 8080 Emulator" />
+<meta itemprop="keywords" content="Software,8080 Emulator,8080 Simulator," /><meta property="og:title" content="GWEMU - Intel 8080 Emulator" />
 <meta property="og:description" content="Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
 Introducing the GWEMU GitHub Project URL" />
 <meta property="og:type" content="article" />
@@ -72,32 +69,20 @@ Introducing the GWEMU GitHub Project URL"/>
 				<h1>GWEMU - Intel 8080 Emulator</h1>
 			</header>
 			<div class="content">
-				
-
-<h2 id="why-write-another-emulator">Why write another emulator<a href="#why-write-another-emulator" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
+				<h2 id="why-write-another-emulator">Why write another emulator<a href="#why-write-another-emulator" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <p>If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.</p>
-
 <h2 id="introducing-the-gwemu">Introducing the GWEMU<a href="#introducing-the-gwemu" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
 <p><a href="https://github.com/gt-retro-computing/i8080-sim">GitHub Project URL</a></p>
-
 <p>Writing this emulator the biggest challenge is probably figuring out how to create a decent looking GUI, as I have no exprience in C/C++ GUI programming. After seeing one of my friend drown in Qt land, I decided to try something different: GTK+ 3. This is a very popular X11 based UI framework, it should be cross-platform (Well at least on mac, I think it also works on windows but your milage may vary).</p>
-
 <blockquote>
-<p>Sidenote: It&rsquo;s kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
+<p>Sidenote: It's kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
 </blockquote>
-
 <p>GTK offered a UI deisgn suite called <code>glade</code> which greatly simplify the process of creating UI. The tool itself is pretty much drag and drop. Although it requires some tinkering to get fully working, compare to writing coding that layout the UI this is not much to complain about.</p>
-
-<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI" /></p>
-
-<p>The UI ended up looking like the picture above. There&rsquo;s not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
-
+<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI"></p>
+<p>The UI ended up looking like the picture above. There's not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
 <h2 id="todo-items">TODO Items<a href="#todo-items" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
 <ul>
-<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can&rsquo;t really read binary)</li>
+<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can't really read binary)</li>
 <li>Disassembler for current instruction. (This might be helpful for debugging unknown program or just helps tracing)</li>
 </ul>
 
@@ -125,7 +110,7 @@ Introducing the GWEMU GitHub Project URL"/>
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 <a href="/">the IMSAI Gang</a></p>
+		<p>&copy; 2020 <a href="/">the IMSAI Gang</a></p>
 		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>

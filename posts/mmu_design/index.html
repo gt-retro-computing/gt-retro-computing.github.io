@@ -7,16 +7,13 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta itemprop="name" content="The MMU - Part 1: Design and measure">
 <meta itemprop="description" content="Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. This is great solution for multiple programs competing for the same blocks of memory.">
-
-
 <meta itemprop="datePublished" content="2019-03-01T12:08:13-05:00" />
 <meta itemprop="dateModified" content="2019-03-01T12:08:13-05:00" />
-<meta itemprop="wordCount" content="366">
+<meta itemprop="wordCount" content="360">
 
 
 
-<meta itemprop="keywords" content="MMU,Hardware," />
-<meta property="og:title" content="The MMU - Part 1: Design and measure" />
+<meta itemprop="keywords" content="MMU,Hardware," /><meta property="og:title" content="The MMU - Part 1: Design and measure" />
 <meta property="og:description" content="Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. This is great solution for multiple programs competing for the same blocks of memory." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/posts/mmu_design/" />
@@ -69,57 +66,48 @@
 				<h1>The MMU - Part 1: Design and measure</h1>
 			</header>
 			<div class="content">
-				
-
-<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU<a href="#creating-an-memory-management-unit-for-the-8080-cpu" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
+				<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU<a href="#creating-an-memory-management-unit-for-the-8080-cpu" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <h2 id="background-and-theory">Background and Theory<a href="#background-and-theory" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
 <p>As part of the project goal is to get this IMSAI to run a modern operating system with
 preemptive multitasking capabilities. A crucial component that is currently missing is the
-<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. Having
+<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. Having
 the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;.
 This is great solution for multiple programs competing for the same blocks of memory.
-In modern processors, the MMU is built as part of the CPU&rsquo;s architecture, so there are
+In modern processors, the MMU is built as part of the CPU's architecture, so there are
 instructions that support memory mapping operation as well as a mapping from the
 memory map table. However, looking at the 8080, there is apparently no support for this at all.
 Therefore a solution to this problem is to &ldquo;expand&rdquo; the instruction set by using the <code>OUT</code>
 instruction with specific address as a &lsquo;trap&rsquo; to address external hardware do the memory mapping.</p>
-
 <h2 id="implementation">Implementation<a href="#implementation" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
 <p>To implement this memory management scheme, we need to bridge the real memory and the CPU address
 space with the MMU. Unfortunately, to achieve this we will be breaking the comparability with any
-of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>.</p>
-
+of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
 <p>The MMU will divide the entire address space (64K) of the CPU into 16 4K sized pages.
-Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup></p>
-
+Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
 <p>To accomplish this mapping feature, the MMU has two on-board register file that contains 16 x 8bit
 and 16 x4 bit registers. The 8 bit register file contains mapping to the physical address space.
-The 4 bit register file contains read/write protection bits when operate in protection ring<sup class="footnote-ref" id="fnref:4"><a href="#fn:4">4</a></sup> 1.</p>
-
+The 4 bit register file contains read/write protection bits when operate in protection ring<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> 1.</p>
 <h3 id="known-limitations">Known limitations<a href="#known-limitations" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-
 <h3 id="measurement-of-the-bus-status-during-different-instruction-cycles">Measurement of the BUS status during different instruction cycles<a href="#measurement-of-the-bus-status-during-different-instruction-cycles" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-
-<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1" />
-<center>Scope Screenshot of the TODO cycle</center></p>
-<div class="footnotes">
-
-<hr />
-
+<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1"></p>
+<!-- raw HTML omitted -->
+<section class="footnotes" role="doc-endnotes">
+<hr>
 <ol>
-<li id="fn:1">Wikipedia: Memory Management Unit
- <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:2">It&rsquo;s not entirely true, as described in the memory map section.
- <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
-<li id="fn:3">Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page.
- <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
-<li id="fn:4"><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>.
- <a class="footnote-return" href="#fnref:4"><sup>[return]</sup></a></li>
+<li id="fn:1" role="doc-endnote">
+<p>Wikipedia: Memory Management Unit <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>It's not entirely true, as described in the memory map section. <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page. <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>. <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
 </ol>
-</div>
+</section>
 
 			</div>
 			<hr class="post-end">
@@ -128,7 +116,7 @@ The 4 bit register file contains read/write protection bits when operate in prot
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/mmu">MMU</a></span><span class="tag"><a href="/tags/hardware">Hardware</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>366 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>360 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-03-01</p>
 			</footer>
 		</article>
@@ -145,7 +133,7 @@ The 4 bit register file contains read/write protection bits when operate in prot
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 <a href="/">the IMSAI Gang</a></p>
+		<p>&copy; 2020 <a href="/">the IMSAI Gang</a></p>
 		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>

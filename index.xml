@@ -28,7 +28,7 @@
       
       <guid>/posts/cpm-boot-up/</guid>
       <description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
-Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+Getting the CP/M Boot disk With some quick research, it&#39;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
     </item>
     
     <item>
@@ -59,8 +59,7 @@ Introducing the GWEMU GitHub Project URL</description>
       <description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-Flex rules
- %{ #include &amp;quot;helpers.</description>
+%{ #include &amp;ldquo;helpers.h&amp;rdquo; #include &amp;ldquo;parser.h&amp;rdquo; %}</description>
     </item>
     
     <item>

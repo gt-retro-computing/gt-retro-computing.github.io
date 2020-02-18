@@ -8,16 +8,13 @@
 <meta itemprop="name" content="Memory Dumper">
 <meta itemprop="description" content="Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
 With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.">
-
-
 <meta itemprop="datePublished" content="2019-02-08T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-02-08T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="211">
 
 
 
-<meta itemprop="keywords" content="Hardware,Software,NewCard," />
-<meta property="og:title" content="Memory Dumper" />
+<meta itemprop="keywords" content="Hardware,Software,NewCard," /><meta property="og:title" content="Memory Dumper" />
 <meta property="og:description" content="Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
 With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte." />
 <meta property="og:type" content="article" />
@@ -72,21 +69,15 @@ With all the modern technology we have got, we decided to make some quick hardwa
 				<h1>Memory Dumper</h1>
 			</header>
 			<div class="content">
-				
-
-<h1 id="background">Background<a href="#background" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
+				<h1 id="background">Background<a href="#background" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
 <p>So we have got our first program running on the old IMSAI 8080 computer.
 Although the process of flipping switches to program the machine in <em>binary</em>
 was an extraordinary experience for the first few days, but very soon it got
 very tedious and slowing us down in the process of debugging the system.</p>
-
 <p>With all the modern technology we have got, we decided to make some quick
 hardware that allows us to directly write the memory without manually entering
 each byte.</p>
-
 <h1 id="overall-design">Overall Design<a href="#overall-design" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <p>The core of this card is a STM32F103C8T6 ARM microcontroller. Ironically it is
 many many times more powerful than the CPU of the system (Intel 8080). However,
 due to the number of IOs that are availiable on the MCU, we are unable to map
@@ -94,9 +85,7 @@ all the necessary pins from the S100 bus directly to the MCU. Thus we had to
 use shiftregisters for both input and output data. The shfit registers that we
 selected are 74HC595 (Serial to Parallel (Used for Output)) and 74HC165
 (Parallel or Serial to Serial (Used for Input)).</p>
-
 <h1 id="schematics">Schematics<a href="#schematics" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <p>The <a href="https://github.com/gt-retro-computing/S100-Memory-Dumper-PCB">PCB Design Files</a>
 are located on Github under S100MemoryDumper-PCB. The board is designed with
 Altium Designer 19. To provide easier and broder access, the exported Gerber
@@ -126,7 +115,7 @@ files are located under the releases tab.</p>
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 <a href="/">the IMSAI Gang</a></p>
+		<p>&copy; 2020 <a href="/">the IMSAI Gang</a></p>
 		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>

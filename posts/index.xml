@@ -16,23 +16,15 @@
 			<guid>/posts/tarbell_md1101/</guid>
 			<description>MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&amp;rdquo; floppy drives.
  The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="md1101">MD1101</h1>
-
+			<content type="html"><![CDATA[<h1 id="md1101">MD1101</h1>
 <p>Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&rdquo; floppy drives.</p>
-
 <blockquote>
-<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <br>
+<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <!-- raw HTML omitted -->
 The interface ran at the standard speed of 250,000 bits per second, and the normal formatted capacity per diskette of 256 kilobytes. Places for two connectors were provided on the board.</p>
 </blockquote>
-
 <h1 id="documentation-typo">Documentation Typo</h1>
-
 <p>The WD1771 chip used by the card actually does not support multi-drive configuration. The card used a 74LS175 Quad D Flip-Flop to select between up to four drives. Drive select only use 2 of the 4 bits in the flip-flop, the other 2 seems to be releatively undocumented. However, the provided sample code for selecting drive would not work. It would cause any subsquent input from the controller to hang the CPU. (Stuck in <code>IN DWAIT</code>)</p>
-
 <p>After a lot of trail and error along with reading the tiny text schematics, we are able to narrow the problem downto that the code is incorrectly setting one of the bit on the Flip Flop. Effectively disabling the controller interrupt request handling thus causing it to hang forever.</p>
-
 <h2 id="modified-code-listing">Modified Code Listing</h2>
 <div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nl">SELECT_DIRVE:</span>
 <span class="c">;Select drive in register C
@@ -43,17 +35,99 @@ The interface ran at the standard speed of 250,000 bits per second, and the norm
 </span><span class="c"></span><span class="no">ORI</span> <span class="mi">0x82</span> <span class="c">;MODIFIED: original is 0x2
 </span><span class="c"></span><span class="no">OUT</span> <span class="no">DEXT</span>
 <span class="nf">RET</span> <span class="c">;return from subroutine
-</span><span class="c"></span><span class="p">---</span></code></pre></div>
-<h1 id="5-25-drive-mod">5.25&rdquo; Drive Mod</h1>
-
+</span><span class="c"></span><span class="p">---</span>
+</code></pre></div><h1 id="525-drive-mod">5.25&rdquo; Drive Mod</h1>
 <p>In addition to the 8&rdquo; drives, we also happen to have a few 5.25&rdquo;
 drive on hand. that we would like to operate as well. Upon close inspection, the 5.25&rdquo; and 8&rdquo; (Shugart 801) interface are not very different from eachother. The only difference being the 5.25&rdquo; drives has a Motor Enable line in lieu of a Head Load (This is due the the difference in physical construction of the drive.) But I think it is okay to subsitute the signal. Since if achieve the same effect which is to <em>begin</em> reading the diskett. Conviently the board has a free 40 pin mounting hole for a additional 2 8&rdquo; drive. We decided to use this connector for our 5.25&rdquo; drive header. This required a lot of jumper wires (All the blue mod wires below).</p>
-
-<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&quot; mod" />
-<center>MD 1101 board after 5.25&rdquo; mod</center></p>
-
-<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup" />
-<center>Overall Machine Setup</center></p>
+<h2 id="drive-pin-mapping">Drive Pin Mapping</h2>
+<p>The pads are labeled across the MD1101 board and are listed with their corresponding name here.
+They must be wired to the corresponding &ldquo;Mapped To&rdquo; pins on the 5.25&rdquo; floppy drive.</p>
+<table>
+<thead>
+<tr>
+<th>Pad</th>
+<th>Name</th>
+<th>Mapped To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E23</td>
+<td>DS0*</td>
+<td>16 (motor en. B)</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>INDX0*</td>
+<td>8 (index)</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>RDY0*</td>
+<td>34 (ready)</td>
+</tr>
+<tr>
+<td>E19</td>
+<td>HLD0*</td>
+<td></td>
+</tr>
+<tr>
+<td>E20</td>
+<td>HLD1*</td>
+<td></td>
+</tr>
+<tr>
+<td>E17</td>
+<td>HLD2*</td>
+<td>12 (drive sel. B)</td>
+</tr>
+<tr>
+<td>E25</td>
+<td>HLD3*</td>
+<td></td>
+</tr>
+<tr>
+<td>E22</td>
+<td>SO*</td>
+<td>18 (direction)</td>
+</tr>
+<tr>
+<td>E21</td>
+<td>SI*</td>
+<td>20 (step)</td>
+</tr>
+<tr>
+<td>E15</td>
+<td>WD*</td>
+<td>22</td>
+</tr>
+<tr>
+<td>E16</td>
+<td>WG*</td>
+<td>24</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>TR00*</td>
+<td>26 (sense track zero)</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>WRPT0*</td>
+<td>28</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>RDAT0*</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pictures">Pictures</h2>
+<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&rdquo; mod"></p>
+<!-- raw HTML omitted -->
+<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup"></p>
+<!-- raw HTML omitted -->
 ]]></content>
 		</item>
 		
@@ -64,45 +138,25 @@ drive on hand. that we would like to operate as well. Upon close inspection, the
 			
 			<guid>/posts/cpm-boot-up/</guid>
 			<description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
-Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="cp-m-2-2">CP/M 2.2</h1>
-
+Getting the CP/M Boot disk With some quick research, it&#39;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+			<content type="html"><![CDATA[<h1 id="cpm-22">CP/M 2.2</h1>
 <p>CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.</p>
-
-<h2 id="getting-the-cp-m-boot-disk">Getting the CP/M Boot disk</h2>
-
-<p>With some quick research, it&rsquo;s not hard to find that instead of having a &ldquo;generic&rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration. It&rsquo;s natural to come to the question of how would we obtain this disk. As according to the manual, the first step of creating such a disk is to have a machine that can run CP/M which unfortunately we don&rsquo;t have.</p>
-
-<h2 id="starting-from-nothing-to-cp-m-bootup">Starting from nothing to CP/M Bootup</h2>
-
+<h2 id="getting-the-cpm-boot-disk">Getting the CP/M Boot disk</h2>
+<p>With some quick research, it's not hard to find that instead of having a &ldquo;generic&rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration. It's natural to come to the question of how would we obtain this disk. As according to the manual, the first step of creating such a disk is to have a machine that can run CP/M which unfortunately we don't have.</p>
+<h2 id="starting-from-nothing-to-cpm-bootup">Starting from nothing to CP/M Bootup</h2>
 <p>As discussed above, we can not go through the steps described in the manual to obtain a working copy of CP/M for our IMSAI. So we have to find out some other creative solutions. Fortunately, we are able to find a copy of a disassembled CP/M operating system. Combining this with out memory dumper card, we should be able to dump this CP/M directly to memory and start from there.</p>
-
-<h3 id="cbios-custom-basic-i-o-system">CBIOS (Custom Basic I/O System)</h3>
-
+<h3 id="cbios-custom-basic-io-system">CBIOS (Custom Basic I/O System)</h3>
 <p>CBIOS is the part of CP/M that differs from system to system, it is the part that the user have to create / modify to suite their specific system needs. We started by implementing the various routines described in the CP/M manual.</p>
-
-<h3 id="loading-cp-m">Loading CP/M</h3>
-
+<h3 id="loading-cpm">Loading CP/M</h3>
 <p>After having the CBIOS written, we can simply dump the CP/M memory image then the assembled CBIOS after hitting reset and run, we are up and running in CP/M</p>
-
 <h2 id="creating-a-boot-disk">Creating a boot disk</h2>
-
 <p>Now that we have a working version of CP/M, the next step is to bootstrap itself so we can perform a cold start without the aid of modern hardware like the memory dumper.</p>
-
 <p>At this point, all we need to do is to implement a program called save_cpm, that reads the memory image, along with our CBIOS and write to floppy disk between track 1 and 2. (Note, leave track 1, sector 0 empty for bootstrap loader we will talk about in the next section).</p>
-
 <h2 id="bootstrap-loader">Bootstrap loader</h2>
-
 <p>The floppy controller we have right now have a &ldquo;phantom&rdquo; ROM that is able to load the track 1, sector 0 of floppy disk to memory and then execute it. We are going to use this hardware feature now to load a very short program (as one sector is only 128 bytes) that is able to load the rest of CP/M. This will be our COLD_BOOT subroutine.</p>
-
 <h1 id="demo-time">Demo time!</h1>
-
-<p>[TODO Youtube Video Link]</p>
-
+<!-- raw HTML omitted -->
 <h1 id="improvements-to-be-made">Improvements to be made</h1>
-
 <ul>
 <li>Update the loader code to support our &ldquo;new floppy controller&rdquo;</li>
 <li>Diagnose our subroutine to check why it causes Z80 incompatabilities</li>
@@ -118,32 +172,20 @@ Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to 
 			<guid>/posts/gwemu_emulator/</guid>
 			<description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
 Introducing the GWEMU GitHub Project URL</description>
-			<content type="html"><![CDATA[
-
-<h2 id="why-write-another-emulator">Why write another emulator</h2>
-
+			<content type="html"><![CDATA[<h2 id="why-write-another-emulator">Why write another emulator</h2>
 <p>If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.</p>
-
 <h2 id="introducing-the-gwemu">Introducing the GWEMU</h2>
-
 <p><a href="https://github.com/gt-retro-computing/i8080-sim">GitHub Project URL</a></p>
-
 <p>Writing this emulator the biggest challenge is probably figuring out how to create a decent looking GUI, as I have no exprience in C/C++ GUI programming. After seeing one of my friend drown in Qt land, I decided to try something different: GTK+ 3. This is a very popular X11 based UI framework, it should be cross-platform (Well at least on mac, I think it also works on windows but your milage may vary).</p>
-
 <blockquote>
-<p>Sidenote: It&rsquo;s kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
+<p>Sidenote: It's kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
 </blockquote>
-
 <p>GTK offered a UI deisgn suite called <code>glade</code> which greatly simplify the process of creating UI. The tool itself is pretty much drag and drop. Although it requires some tinkering to get fully working, compare to writing coding that layout the UI this is not much to complain about.</p>
-
-<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI" /></p>
-
-<p>The UI ended up looking like the picture above. There&rsquo;s not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
-
+<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI"></p>
+<p>The UI ended up looking like the picture above. There's not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
 <h2 id="todo-items">TODO Items</h2>
-
 <ul>
-<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can&rsquo;t really read binary)</li>
+<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can't really read binary)</li>
 <li>Disassembler for current instruction. (This might be helpful for debugging unknown program or just helps tracing)</li>
 </ul>
 ]]></content>
@@ -156,29 +198,22 @@ Introducing the GWEMU GitHub Project URL</description>
 			
 			<guid>/posts/new_sio_compatable_serial_card/</guid>
 			<description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
-			<content type="html"><![CDATA[
-
-<p>Although the system we have does include an original IMSAI SIO-2 card,
+			<content type="html"><![CDATA[<p>Although the system we have does include an original IMSAI SIO-2 card,
 which includes 2 RS-232 compatable serial interface. However, we are unable
 to get the card working reliably. (#TODO Link Post Here) While repairing the
 original IMSAI SIO-2 card is still in the long term plan, we decided to
 implement a custom and modern serial solution that emulates the IMSAI SIO-2
 board with Intel 8051 USART communication interface IC.</p>
-
 <h1 id="overall-planning">Overall Planning</h1>
-
 <p>The overall plan is to use the USART capability of the <em>STM32F103C8T6</em> MCU to
 recieve data on the output port of the S100 Bus. However, due to the lack of
 pins on the MCU, and the level shifting required between the RS-232 interface
 and the TTL-UART interface of the MCU, there are quite some supporting circuitry
 required for this to function properly.</p>
-
 <h1 id="circuit-design">Circuit Design</h1>
-
 <h2 id="rs-232-to-ttl-uart-level-shifter">RS-232 to TTL UART Level Shifter</h2>
-
 <p>I think it would be a good idea to describe the problem first before I go on
-to talk about solution. It would be coufusing wouldn&rsquo;t it be? So in short,
+to talk about solution. It would be coufusing wouldn't it be? So in short,
 the RS-232 standard defined the logic level of the serial interface using both
 positive and negative voltages. A logical &lsquo;1&rsquo; is defined as any voltage between
 -3V and -18V, and a logical &lsquo;0&rsquo; is defined as voltage between +3V and +18V. The
@@ -189,50 +224,34 @@ positive voltage as a &lsquo;0&rsquo;. However, the key problem comes in when we
 specification of the TTL serial interface. Where a logical &lsquo;1&rsquo; is defined as VCC
 (Commonly 5 or 3.3V), and a logical &lsquo;0&rsquo; is defined as ~0V. An easy solution
 would be use an IC like MAX232 from Maxium Integrated. However, purchasing IC
-takes time and it&rsquo;s always better to use commonly found component from both
+takes time and it's always better to use commonly found component from both
 economic and maintainability perspectives.</p>
-
 <p>//TODO Insert Circuit Diagram of the RS-232 Level Shifter</p>
-
 <p>The above circuit is what we decided to use for the RS-232 level shifting. It
 consists of one pair of NPN and PNP transistor (2N3904 and 2N3906). Essentially
 used a charge-pump to provide the negative voltage required by the RS-232 standard.</p>
-
-<h2 id="3-3v-to-ttl-logic-level-shifter">3.3V to TTL Logic Level Shifter</h2>
-
+<h2 id="33v-to-ttl-logic-level-shifter">3.3V to TTL Logic Level Shifter</h2>
 <p>The IMSAI operated at TTL Logic level. Although many pins on the STM32 are 5V
 tolerant(It can acceot 5V voltage level), non of its pin can produce a high enough
 voltage for the IMSAI to consider it a logical &lsquo;1&rsquo;. Thus we need a PNP transistor
-with 2 supporting resistor on each of the *DI** lines to do level shifting.</p>
-
+with 2 supporting resistor on each of the <em>DI</em>* lines to do level shifting.</p>
 <h1 id="measurement">Measurement</h1>
-
 <p>In order to operate on the OUTPUT port of the Intel 8080 processor, we need to
 decode the signal on the S100 Bus. Due the failure of me last time naively trying
 to construct a output address decoder, I will make some measurements before
 continuing.</p>
-
-<h2 id="out-put-port-signal-decoding"><strong>OUT</strong>put port signal decoding</h2>
-
-<p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction" /></p>
-
+<h2 id="output-port-signal-decoding"><strong>OUT</strong>put port signal decoding</h2>
+<p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction"></p>
 <p>The above image is the Intel 8080 processor executing and OUT instruction to port
-0xFF (The Lights) with data 0xFF.
-<details><summary>Exact instruction listing.</summary></p>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">CMA</span> <span class="c">; Complement A, as A is initialized to 0, this makes it 0xFF
-</span><span class="c"></span><span class="no">OUT</span> <span class="mi">0xFF</span> <span class="c">;
-</span><span class="c"></span><span class="no">HLT</span> <span class="err">;</span> <span class="no">HALT</span> <span class="no">is</span> <span class="no">added</span> <span class="no">to</span> <span class="no">assure</span> <span class="no">clean</span> <span class="no">signal</span> <span class="no">capature.</span> <span class="no">The</span> <span class="no">Wait</span> <span class="no">line</span> <span class="no">is</span> <span class="no">used</span> <span class="no">for</span> <span class="no">trigger</span></code></pre></div>
-<p></details></p>
-
+0xFF (The Lights) with data 0xFF.</p>
+<!-- raw HTML omitted -->
 <p>As we can see from the logic anaylizer, the address of the port is first written to
 the S100 Bus, then sOUT signal comes HIGH, at this point the address on the bus should
 be a valid OUT PORT address. (This address is duplicated (A0-A7 = A8-A15) on the bus).
 This is when port matching could happen; however, data is not valid at this moment.
 Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LOW.</p>
-
 <h2 id="input-port-signal-decoding">Input Port Signal Decoding</h2>
-
-<p><img src="/image/post/new_sio_card/In.png" alt="IMSAI Executing an IN Instruction" /></p>
+<p><img src="/image/post/new_sio_card/In.png" alt="IMSAI Executing an IN Instruction"></p>
 ]]></content>
 		</item>
 		
@@ -245,141 +264,112 @@ Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LO
 			<description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
 The finished assembler can be found on our Github repository
 Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
-Flex rules
- %{ #include &amp;quot;helpers.</description>
-			<content type="html"><![CDATA[
-
-<p>On the software side, to build an operating system, we will definitly need a compiler and an assembler.
+%{ #include &amp;ldquo;helpers.h&amp;rdquo; #include &amp;ldquo;parser.h&amp;rdquo; %}</description>
+			<content type="html"><![CDATA[<p>On the software side, to build an operating system, we will definitly need a compiler and an assembler.
 As the assembler is the simpler task of the two, we decided to start with this.</p>
-
 <p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
-
-<h1 id="lexer-tokenizer">Lexer / Tokenizer</h1>
-
+<h1 id="lexer--tokenizer">Lexer / Tokenizer</h1>
 <p>The first part of any compiler (assembler) is to lex the source language. This is done using flex.</p>
-
-<p><details><summary>Flex rules</summary></p>
-
-<pre><code>
-%{
-    #include &quot;helpers.h&quot;
-    #include &quot;parser.h&quot;
-%}
-
-%option outfile=&quot;lexer.c&quot; header-file=&quot;lexer.h&quot;
-
-%option noyywrap
-
-COMMA &quot;,&quot;
-COLON &quot;:&quot;
-COMMENT &quot;;&quot;[^\n\r]*
-DOT &quot;\.&quot;
+<!-- raw HTML omitted -->
+<p>%{
+#include &ldquo;helpers.h&rdquo;
+#include &ldquo;parser.h&rdquo;
+%}</p>
+<p>%option outfile=&quot;lexer.c&rdquo; header-file=&quot;lexer.h&rdquo;</p>
+<p>%option noyywrap</p>
+<p>COMMA &ldquo;,&rdquo;
+COLON &ldquo;:&rdquo;
+COMMENT &ldquo;;&quot;[^\n\r]*
+DOT &ldquo;.&rdquo;
 WHITE_SPACE [ \t]*
-LINE_BREAK [\n\r]
-
-IDENT [A-Za-z_][A-Za-z0-9_\-]*
-
-HEX 0[Xx][0-9A-Fa-f]+
+LINE_BREAK [\n\r]</p>
+<p>IDENT [A-Za-z_][A-Za-z0-9_-]*</p>
+<p>HEX 0[Xx][0-9A-Fa-f]+
 OCT 0[0-7]+
-DEC [0-9]+
-
-%%
-
-{WHITE_SPACE} {}
+DEC [0-9]+</p>
+<p>%%</p>
+<p>{WHITE_SPACE} {}
 {LINE_BREAK} {yylineno++; return TOKEN_LINEBREAK; }
 {COMMENT} {}
 {COMMA} {return TOKEN_COMMA;}
 {COLON} {return TOKEN_COLON;}
 {DOT} {return TOKEN_DOT;}
-{DEC} { sscanf(yytext, &quot;%i&quot;, &amp;yylval.num); return TOKEN_NUM; }
-{OCT} { sscanf(yytext, &quot;%o&quot;, &amp;yylval.num); return TOKEN_NUM; }
-{HEX} { sscanf(yytext, &quot;%x&quot;, &amp;yylval.num); return TOKEN_NUM; }
-{IDENT} { yylval.ident = copy_str(yytext); return TOKEN_IDENT;}
+{DEC} { sscanf(yytext, &ldquo;%i&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{OCT} { sscanf(yytext, &ldquo;%o&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{HEX} { sscanf(yytext, &ldquo;%x&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{IDENT} { yylval.ident = copy_str(yytext); return TOKEN_IDENT;}</p>
+<p>%%</p>
+<p>int yyerror(const char* msg)
+{ <br>
+fprintf(stderr,&ldquo;Error text = %s | Line: %d\n%s\n&rdquo;,yytext, yylineno, msg);
+return 0;
+}</p>
+<pre><code>&lt;/details&gt;
 
-%%
-
-int yyerror(const char* msg)
-{    
-    fprintf(stderr,&quot;Error text = %s | Line: %d\n%s\n&quot;,yytext, yylineno, msg);
-    return 0;
-}
-</code></pre>
-
-<p></details></p>
-
-<h1 id="parsing">Parsing</h1>
-
-<p>After the flex parsed the input, we can use the generated tokens to parse the assembly. The strucutre is essentially made of three types of element in the abstract syntax (Tree): <code>instruction</code>, <code>label</code>, and <code>directive</code></p>
-
-<h2 id="first-pass">First Pass</h2>
-
-<p>the goal of the first pass is to generate the symbol table, as well as identify every instruction (Also detecting illegal instructions) as well as its respective arguments. However, due to the fact we are creating symbol table in this pass, thus we can not detect references to invalid labels (yet).
-Below is a sample program <a href="/posts/first_program/">fib.s</a>.
-<details><summary>Output After First Pass 1</summary></p>
-
-<pre><code>(D[1]): .org (ADDR 0x0) 
+# Parsing
+After the flex parsed the input, we can use the generated tokens to parse the assembly. The strucutre is essentially made of three types of element in the abstract syntax (Tree): ```instruction```, ```label```, and ```directive```
+## First Pass
+the goal of the first pass is to generate the symbol table, as well as identify every instruction (Also detecting illegal instructions) as well as its respective arguments. However, due to the fact we are creating symbol table in this pass, thus we can not detect references to invalid labels (yet).
+Below is a sample program [fib.s](/posts/first_program/).
+&lt;details&gt;&lt;summary&gt;Output After First Pass 1&lt;/summary&gt;
+</code></pre><p>(D[1]): .org (ADDR 0x0)
 (L) [0x0] init
-(I[0]): sphl 
-(I[2]): mvi (REG a)(IMM 0) 
-(I[2]): mvi (REG b)(IMM 1) 
-(I[2]): mvi (REG l)(IMM 255) 
+(I[0]): sphl
+(I[2]): mvi (REG a)(IMM 0)
+(I[2]): mvi (REG b)(IMM 1)
+(I[2]): mvi (REG l)(IMM 255)
 (L) [0x7] fib
 (I[2]): mov (REG c)(REG a)
 (I[1]): add (REG b)
-(I[1]): jc (ADDR [init]) 
+(I[1]): jc (ADDR [init])
 (I[1]): xra (REG l)
-(I[1]): out (ADDR 0xFF) 
+(I[1]): out (ADDR 0xFF)
 (I[1]): xra (REG l)
 (I[2]): mov (REG b)(REG c)
 (I[2]): mov (REG h)(REG a)
-(I[2]): lxi (REGP bc)(IMM 65535) 
+(I[2]): lxi (REGP bc)(IMM 65535)
 (L) [0x15] delay
 (I[1]): dcx (REGP bc)
 (I[2]): mov (REG a)(REG d)
 (I[1]): ora (REG e)
-(I[1]): jnz (ADDR [delay]) 
+(I[1]): jnz (ADDR [delay])
 (I[2]): mov (REG a)(REG h)
-(I[1]): jmp (ADDR [fib]) 
+(I[1]): jmp (ADDR [fib])</p>
+<pre><code> This is part of the assembler's debug output. Format reads as follow: (Type: D:Directive, I:Instruction, L:Label. [Number of Arguments Associated With This Node]): [Resolved Label Address]
+&lt;/details&gt;
 
-</code></pre>
 
-<p>This is part of the assembler&rsquo;s debug output. Format reads as follow: (Type: D:Directive, I:Instruction, L:Label. [Number of Arguments Associated With This Node]): [Resolved Label Address]
-</details></p>
+## Pass 2: Address Subsistution 
 
-<h2 id="pass-2-address-subsistution">Pass 2: Address Subsistution</h2>
+As you can see from the output of 1st pass, it still looks very much like the original assembly input. This is very close to the final output, as an assembler is a very simple compiler. It is really close
+to the final output of the progarm, the missing step is to backfill the label reference and translate the mnemonic into binary instruction.
 
-<p>As you can see from the output of 1st pass, it still looks very much like the original assembly input. This is very close to the final output, as an assembler is a very simple compiler. It is really close
-to the final output of the progarm, the missing step is to backfill the label reference and translate the mnemonic into binary instruction.</p>
-
-<p><details><summary>Output from stage 2</summary></p>
-
-<pre><code>(D[1]): .org (ADDR 0x0) 
+&lt;details&gt;&lt;summary&gt;Output from stage 2&lt;/summary&gt;
+</code></pre><p>(D[1]): .org (ADDR 0x0)
 (L) [0x0] init
-(I[0]): sphl 
-(I[2]): mvi (REG a)(IMM 0) 
-(I[2]): mvi (REG b)(IMM 1) 
-(I[2]): mvi (REG l)(IMM 255) 
+(I[0]): sphl
+(I[2]): mvi (REG a)(IMM 0)
+(I[2]): mvi (REG b)(IMM 1)
+(I[2]): mvi (REG l)(IMM 255)
 (L) [0x7] fib
 (I[2]): mov (REG c)(REG a)
 (I[1]): add (REG b)
-(I[1]): jc (ADDR 0x0) 
+(I[1]): jc (ADDR 0x0)
 (I[1]): xra (REG l)
-(I[1]): out (ADDR 0xFF) 
+(I[1]): out (ADDR 0xFF)
 (I[1]): xra (REG l)
 (I[2]): mov (REG b)(REG c)
 (I[2]): mov (REG h)(REG a)
-(I[2]): lxi (REGP bc)(IMM 65535) 
+(I[2]): lxi (REGP bc)(IMM 65535)
 (L) [0x15] delay
 (I[1]): dcx (REGP bc)
 (I[2]): mov (REG a)(REG d)
 (I[1]): ora (REG e)
-(I[1]): jnz (ADDR 0x15) 
+(I[1]): jnz (ADDR 0x15)
 (I[2]): mov (REG a)(REG h)
-(I[1]): jmp (ADDR 0x7) 
-</code></pre>
-
-<p></details></p>
-]]></content>
+(I[1]): jmp (ADDR 0x7)</p>
+<pre><code>&lt;/details&gt;
+</code></pre>]]></content>
 		</item>
 		
 		<item>
@@ -390,20 +380,14 @@ to the final output of the progarm, the missing step is to backfill the label re
 			<guid>/posts/imsai_sio_debugging/</guid>
 			<description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
 Troubleshooting Naive attempt at the example give from the original IMSAI Manual.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="status-finding-issue">Status: Finding Issue</h1>
-
+			<content type="html"><![CDATA[<h1 id="status-finding-issue">Status: Finding Issue</h1>
 <p>As listed in the system summary, we have an original IMSAI SIO-2 card. Which
 contains 2 USART serial interfaces. This is post will document the process and
 steps we took to debug and repair the card. Simply following the directions from
 the manual did not give us the expected result, thus this post will be quite
 long.</p>
-
 <h1 id="troubleshooting">Troubleshooting</h1>
-
 <h2 id="naive-attempt-at-the-example-give-from-the-original-imsai-manual">Naive attempt at the example give from the original IMSAI Manual.</h2>
-
 <pre><code>; jsio.asm jha 8/2/2018 testing sio
 ; https://wiki.theretrowagon.com/wiki/Imsai_8080
 ; Originally from a Monitor program code by John Garza hence the EQUates
@@ -460,8 +444,7 @@ ani TTYTR           ; ready to receive?
     out TTO         ; write
     jmp inout       ; repeat
     end
-</code></pre>
-]]></content>
+</code></pre>]]></content>
 		</item>
 		
 		<item>
@@ -471,57 +454,48 @@ ani TTYTR           ; ready to receive?
 			
 			<guid>/posts/mmu_design/</guid>
 			<description>Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &amp;ldquo;virtual address spaces&amp;rdquo;. This is great solution for multiple programs competing for the same blocks of memory.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU</h1>
-
+			<content type="html"><![CDATA[<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU</h1>
 <h2 id="background-and-theory">Background and Theory</h2>
-
 <p>As part of the project goal is to get this IMSAI to run a modern operating system with
 preemptive multitasking capabilities. A crucial component that is currently missing is the
-<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>. Having
+<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. Having
 the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;.
 This is great solution for multiple programs competing for the same blocks of memory.
-In modern processors, the MMU is built as part of the CPU&rsquo;s architecture, so there are
+In modern processors, the MMU is built as part of the CPU's architecture, so there are
 instructions that support memory mapping operation as well as a mapping from the
 memory map table. However, looking at the 8080, there is apparently no support for this at all.
 Therefore a solution to this problem is to &ldquo;expand&rdquo; the instruction set by using the <code>OUT</code>
 instruction with specific address as a &lsquo;trap&rsquo; to address external hardware do the memory mapping.</p>
-
 <h2 id="implementation">Implementation</h2>
-
 <p>To implement this memory management scheme, we need to bridge the real memory and the CPU address
 space with the MMU. Unfortunately, to achieve this we will be breaking the comparability with any
-of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup>.</p>
-
+of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
 <p>The MMU will divide the entire address space (64K) of the CPU into 16 4K sized pages.
-Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup></p>
-
+Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
 <p>To accomplish this mapping feature, the MMU has two on-board register file that contains 16 x 8bit
 and 16 x4 bit registers. The 8 bit register file contains mapping to the physical address space.
-The 4 bit register file contains read/write protection bits when operate in protection ring<sup class="footnote-ref" id="fnref:4"><a href="#fn:4">4</a></sup> 1.</p>
-
+The 4 bit register file contains read/write protection bits when operate in protection ring<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> 1.</p>
 <h3 id="known-limitations">Known limitations</h3>
-
 <h3 id="measurement-of-the-bus-status-during-different-instruction-cycles">Measurement of the BUS status during different instruction cycles</h3>
-
-<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1" />
-<center>Scope Screenshot of the TODO cycle</center></p>
-<div class="footnotes">
-
-<hr />
-
+<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1"></p>
+<!-- raw HTML omitted -->
+<section class="footnotes" role="doc-endnotes">
+<hr>
 <ol>
-<li id="fn:1">Wikipedia: Memory Management Unit
- <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
-<li id="fn:2">It&rsquo;s not entirely true, as described in the memory map section.
- <a class="footnote-return" href="#fnref:2"><sup>[return]</sup></a></li>
-<li id="fn:3">Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page.
- <a class="footnote-return" href="#fnref:3"><sup>[return]</sup></a></li>
-<li id="fn:4"><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>.
- <a class="footnote-return" href="#fnref:4"><sup>[return]</sup></a></li>
+<li id="fn:1" role="doc-endnote">
+<p>Wikipedia: Memory Management Unit <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>It's not entirely true, as described in the memory map section. <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page. <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>. <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
 </ol>
-</div>
+</section>
 ]]></content>
 		</item>
 		
@@ -533,21 +507,15 @@ The 4 bit register file contains read/write protection bits when operate in prot
 			<guid>/posts/memory_dumper/</guid>
 			<description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
 With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="background">Background</h1>
-
+			<content type="html"><![CDATA[<h1 id="background">Background</h1>
 <p>So we have got our first program running on the old IMSAI 8080 computer.
 Although the process of flipping switches to program the machine in <em>binary</em>
 was an extraordinary experience for the first few days, but very soon it got
 very tedious and slowing us down in the process of debugging the system.</p>
-
 <p>With all the modern technology we have got, we decided to make some quick
 hardware that allows us to directly write the memory without manually entering
 each byte.</p>
-
 <h1 id="overall-design">Overall Design</h1>
-
 <p>The core of this card is a STM32F103C8T6 ARM microcontroller. Ironically it is
 many many times more powerful than the CPU of the system (Intel 8080). However,
 due to the number of IOs that are availiable on the MCU, we are unable to map
@@ -555,9 +523,7 @@ all the necessary pins from the S100 bus directly to the MCU. Thus we had to
 use shiftregisters for both input and output data. The shfit registers that we
 selected are 74HC595 (Serial to Parallel (Used for Output)) and 74HC165
 (Parallel or Serial to Serial (Used for Input)).</p>
-
 <h1 id="schematics">Schematics</h1>
-
 <p>The <a href="https://github.com/gt-retro-computing/S100-Memory-Dumper-PCB">PCB Design Files</a>
 are located on Github under S100MemoryDumper-PCB. The board is designed with
 Altium Designer 19. To provide easier and broder access, the exported Gerber
@@ -573,15 +539,11 @@ files are located under the releases tab.</p>
 			<guid>/posts/frontpanel_broke_down/</guid>
 			<description>Front panel repair During the process of testing the memory dumper card, we found some how the front panel is behaving weirdly.
 Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10 (Dual Tri-input NAND gates). Which controls the input switches.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="front-panel-repair">Front panel repair</h1>
-
+			<content type="html"><![CDATA[<h1 id="front-panel-repair">Front panel repair</h1>
 <p>During the process of testing the <a href="/posts/memory_dumper">memory dumper card</a>, we found some how the
 front panel is behaving weirdly.</p>
-
 <p>Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10
- (Dual Tri-input NAND gates). Which controls the input switches.</p>
+(Dual Tri-input NAND gates). Which controls the input switches.</p>
 ]]></content>
 		</item>
 		
@@ -593,18 +555,13 @@ front panel is behaving weirdly.</p>
 			<guid>/posts/first_program/</guid>
 			<description>Computing the Fibonacci Series We have got the computer operational again. As of right now, everything essential is working again. The IMSAI 8080 come with a input and output both addressed on port 0xFF which maps to the higher 8 bits of address and the 8 led on the top left corner of the front panel.
 The first program we decided to run on the machine is to compute the fibonacci series and display them one at a time on the front panel led.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="computing-the-fibonacci-series">Computing the Fibonacci Series</h1>
-
+			<content type="html"><![CDATA[<h1 id="computing-the-fibonacci-series">Computing the Fibonacci Series</h1>
 <p>We have got the computer operational again. As of right now, everything
 essential is working again. The IMSAI 8080 come with a input and output
 both addressed on port <code>0xFF</code> which maps to the higher 8 bits of
 address and the 8 led on the top left corner of the front panel.</p>
-
 <p>The first program we decided to run on the machine is to compute the fibonacci
 series and display them one at a time on the front panel led.</p>
-
 <p>Below is the listing and video of it running</p>
 <div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">;fib
 </span><span class="c"></span><span class="na">.org</span> <span class="mi">0</span>
@@ -629,19 +586,13 @@ series and display them one at a time on the front panel led.</p>
 	<span class="nf">ora</span> <span class="no">e</span>
 	<span class="nf">jnz</span> <span class="no">delay</span>
 	<span class="nf">mov</span> <span class="no">a</span><span class="p">,</span> <span class="no">h</span>
-	<span class="nf">jmp</span> <span class="no">fib</span></code></pre></div>
-<h1 id="videos">Videos</h1>
-
-<p><center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/9FKPAX2WN8E" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center>
-<center>The above code executed</center></p>
-
+	<span class="nf">jmp</span> <span class="no">fib</span>
+</code></pre></div><h1 id="videos">Videos</h1>
+<!-- raw HTML omitted -->
 <h1 id="original-single-stepped-version">Original Single Stepped version.</h1>
-
-<p>This is the first <em>actual</em> first program we got working on this machine. There&rsquo;s lots of patching
-thus includes a lot of  <code>NOP</code> and <code>JMP</code> instructions.
-<center><iframe width="560" height="315" src="https://www.youtube.com/embed/Uavji8Hw_UQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center></p>
+<p>This is the first <em>actual</em> first program we got working on this machine. There's lots of patching
+thus includes a lot of  <code>NOP</code> and <code>JMP</code> instructions.</p>
+<!-- raw HTML omitted -->
 ]]></content>
 		</item>
 		
@@ -654,48 +605,35 @@ thus includes a lot of  <code>NOP</code> and <code>JMP</code> instructions.
 			<description>The IMSAI 8080  TLDR; this post documents the IMSAI system as we got it.
  Through the VIP program at Georgia Tech, we were able to acquire an IMSAI 8080 system to work on. Initially I had little to no knowledge about the IMSAI system. Through some quick web search we were able to find the manual for the computer and understand some history behind it.
 History The IMSAI 8080 is one of the first desktop computer at the time.</description>
-			<content type="html"><![CDATA[
-
-<h1 id="the-imsai-8080">The IMSAI 8080</h1>
-
+			<content type="html"><![CDATA[<h1 id="the-imsai-8080">The IMSAI 8080</h1>
 <blockquote>
 <p>TLDR; this post documents the IMSAI system as we got it.</p>
 </blockquote>
-
 <p>Through the VIP program at Georgia Tech,
 we were able to acquire an IMSAI 8080 system to work on.
 Initially I had little to no knowledge about the IMSAI system.
 Through some quick web search we were able to find the manual for the computer
 and understand some history behind it.</p>
-
 <h2 id="history">History</h2>
-
 <p>The IMSAI 8080 is one of the first desktop computer at the time.
-(following the Altair 8800) It&rsquo;s also one of the machine that shaped the S-100 Bus
+(following the Altair 8800) It's also one of the machine that shaped the S-100 Bus
 standard which ruled the personal computing market for quite a while back in the 1970s.</p>
-
-<p>The IMSAI 8080 come standard with a MPU (MPU-A) board equipped with an Intel&trade; 8080 CPU and
+<p>The IMSAI 8080 come standard with a MPU (MPU-A) board equipped with an Intel™ 8080 CPU and
 IMSAI MPU front panel.</p>
-
 <h1 id="our-system">Our System</h1>
-
 <p>These are the boards that we got along with the machine</p>
-
 <h2 id="imsai-mpu-a">IMSAI MPU-A</h2>
-
-<p>This is the original CPU board that shipped with the system. It contains the Intel&trade; 8080
-CPU and some supporting circuitry. The board looks complicated, as the Intel&trade; 8080 requires
+<p>This is the original CPU board that shipped with the system. It contains the Intel™ 8080
+CPU and some supporting circuitry. The board looks complicated, as the Intel™ 8080 requires
 rather complicated support circuitry including a special 2 phase clock generator
 and 3 rail power supply (±5V and 12V).</p>
-
-<p>As shown in the picture, the white and gold ceramic packaged chip is the Intel&trade; 8080 CPU.
+<p>As shown in the picture, the white and gold ceramic packaged chip is the Intel™ 8080 CPU.
 This particular one is made in Malaysia 1977.
 On the top right there is an empty socket, which is the for the front panel (CPA) and CPU private
 bus to connect to. Although it looks like a 16 pin socket, in reality the two pins are shorted in
 every column. It only carries an 8-bit signal (data bus) between the front panel and the CPU board.</p>
-
-<p><a href="/image/post/powerup/MPU-A.jpeg" target="_blank"><img src="/image/post/powerup/thumb/MPU-A.jpeg" alt="IMSAI MPU-A" /></a>
-<center><em>The IMSAI MPU</em> (click for a larger image)</center></p>
+<p><!-- raw HTML omitted --><img src="/image/post/powerup/thumb/MPU-A.jpeg" alt="IMSAI MPU-A"><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
 ]]></content>
 		</item>
 		

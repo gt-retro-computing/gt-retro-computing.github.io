@@ -7,16 +7,13 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta itemprop="name" content="New SIO Compatable Serial Card">
 <meta itemprop="description" content="Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.">
-
-
 <meta itemprop="datePublished" content="2019-04-03T22:27:06-04:00" />
 <meta itemprop="dateModified" content="2019-04-03T22:27:06-04:00" />
-<meta itemprop="wordCount" content="635">
+<meta itemprop="wordCount" content="598">
 
 
 
-<meta itemprop="keywords" content="SerialCard,Hardware,NewCard,IMSAI SIO,S100 SIO," />
-<meta property="og:title" content="New SIO Compatable Serial Card" />
+<meta itemprop="keywords" content="SerialCard,Hardware,NewCard,IMSAI SIO,S100 SIO," /><meta property="og:title" content="New SIO Compatable Serial Card" />
 <meta property="og:description" content="Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/posts/new_sio_compatable_serial_card/" />
@@ -69,29 +66,22 @@
 				<h1>New SIO Compatable Serial Card</h1>
 			</header>
 			<div class="content">
-				
-
-<p>Although the system we have does include an original IMSAI SIO-2 card,
+				<p>Although the system we have does include an original IMSAI SIO-2 card,
 which includes 2 RS-232 compatable serial interface. However, we are unable
 to get the card working reliably. (#TODO Link Post Here) While repairing the
 original IMSAI SIO-2 card is still in the long term plan, we decided to
 implement a custom and modern serial solution that emulates the IMSAI SIO-2
 board with Intel 8051 USART communication interface IC.</p>
-
 <h1 id="overall-planning">Overall Planning<a href="#overall-planning" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <p>The overall plan is to use the USART capability of the <em>STM32F103C8T6</em> MCU to
 recieve data on the output port of the S100 Bus. However, due to the lack of
 pins on the MCU, and the level shifting required between the RS-232 interface
 and the TTL-UART interface of the MCU, there are quite some supporting circuitry
 required for this to function properly.</p>
-
 <h1 id="circuit-design">Circuit Design<a href="#circuit-design" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <h2 id="rs-232-to-ttl-uart-level-shifter">RS-232 to TTL UART Level Shifter<a href="#rs-232-to-ttl-uart-level-shifter" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
 <p>I think it would be a good idea to describe the problem first before I go on
-to talk about solution. It would be coufusing wouldn&rsquo;t it be? So in short,
+to talk about solution. It would be coufusing wouldn't it be? So in short,
 the RS-232 standard defined the logic level of the serial interface using both
 positive and negative voltages. A logical &lsquo;1&rsquo; is defined as any voltage between
 -3V and -18V, and a logical &lsquo;0&rsquo; is defined as voltage between +3V and +18V. The
@@ -102,50 +92,34 @@ positive voltage as a &lsquo;0&rsquo;. However, the key problem comes in when we
 specification of the TTL serial interface. Where a logical &lsquo;1&rsquo; is defined as VCC
 (Commonly 5 or 3.3V), and a logical &lsquo;0&rsquo; is defined as ~0V. An easy solution
 would be use an IC like MAX232 from Maxium Integrated. However, purchasing IC
-takes time and it&rsquo;s always better to use commonly found component from both
+takes time and it's always better to use commonly found component from both
 economic and maintainability perspectives.</p>
-
 <p>//TODO Insert Circuit Diagram of the RS-232 Level Shifter</p>
-
 <p>The above circuit is what we decided to use for the RS-232 level shifting. It
 consists of one pair of NPN and PNP transistor (2N3904 and 2N3906). Essentially
 used a charge-pump to provide the negative voltage required by the RS-232 standard.</p>
-
-<h2 id="3-3v-to-ttl-logic-level-shifter">3.3V to TTL Logic Level Shifter<a href="#3-3v-to-ttl-logic-level-shifter" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
+<h2 id="33v-to-ttl-logic-level-shifter">3.3V to TTL Logic Level Shifter<a href="#33v-to-ttl-logic-level-shifter" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <p>The IMSAI operated at TTL Logic level. Although many pins on the STM32 are 5V
 tolerant(It can acceot 5V voltage level), non of its pin can produce a high enough
 voltage for the IMSAI to consider it a logical &lsquo;1&rsquo;. Thus we need a PNP transistor
-with 2 supporting resistor on each of the *DI** lines to do level shifting.</p>
-
+with 2 supporting resistor on each of the <em>DI</em>* lines to do level shifting.</p>
 <h1 id="measurement">Measurement<a href="#measurement" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
-
 <p>In order to operate on the OUTPUT port of the Intel 8080 processor, we need to
 decode the signal on the S100 Bus. Due the failure of me last time naively trying
 to construct a output address decoder, I will make some measurements before
 continuing.</p>
-
-<h2 id="out-put-port-signal-decoding"><strong>OUT</strong>put port signal decoding<a href="#out-put-port-signal-decoding" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
-<p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction" /></p>
-
+<h2 id="output-port-signal-decoding"><strong>OUT</strong>put port signal decoding<a href="#output-port-signal-decoding" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction"></p>
 <p>The above image is the Intel 8080 processor executing and OUT instruction to port
-0xFF (The Lights) with data 0xFF.
-<details><summary>Exact instruction listing.</summary></p>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">CMA</span> <span class="c">; Complement A, as A is initialized to 0, this makes it 0xFF
-</span><span class="c"></span><span class="no">OUT</span> <span class="mi">0xFF</span> <span class="c">;
-</span><span class="c"></span><span class="no">HLT</span> <span class="err">;</span> <span class="no">HALT</span> <span class="no">is</span> <span class="no">added</span> <span class="no">to</span> <span class="no">assure</span> <span class="no">clean</span> <span class="no">signal</span> <span class="no">capature.</span> <span class="no">The</span> <span class="no">Wait</span> <span class="no">line</span> <span class="no">is</span> <span class="no">used</span> <span class="no">for</span> <span class="no">trigger</span></code></pre></div>
-<p></details></p>
-
+0xFF (The Lights) with data 0xFF.</p>
+<!-- raw HTML omitted -->
 <p>As we can see from the logic anaylizer, the address of the port is first written to
 the S100 Bus, then sOUT signal comes HIGH, at this point the address on the bus should
 be a valid OUT PORT address. (This address is duplicated (A0-A7 = A8-A15) on the bus).
 This is when port matching could happen; however, data is not valid at this moment.
 Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LOW.</p>
-
 <h2 id="input-port-signal-decoding">Input Port Signal Decoding<a href="#input-port-signal-decoding" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-
-<p><img src="/image/post/new_sio_card/In.png" alt="IMSAI Executing an IN Instruction" /></p>
+<p><img src="/image/post/new_sio_card/In.png" alt="IMSAI Executing an IN Instruction"></p>
 
 			</div>
 			<hr class="post-end">
@@ -154,7 +128,7 @@ Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LO
 				<p>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/serialcard">SerialCard</a></span><span class="tag"><a href="/tags/hardware">Hardware</a></span><span class="tag"><a href="/tags/newcard">NewCard</a></span><span class="tag"><a href="/tags/imsai-sio">IMSAI SIO</a></span><span class="tag"><a href="/tags/s100-sio">S100 SIO</a></span>
 				</p>
-				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>635 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>598 Words</p>
 				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-03</p>
 			</footer>
 		</article>
@@ -171,7 +145,7 @@ Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LO
 	</main>
 
 	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
-		<p>&copy; 2019 <a href="/">the IMSAI Gang</a></p>
+		<p>&copy; 2020 <a href="/">the IMSAI Gang</a></p>
 		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
 		</p>
 	</footer>
