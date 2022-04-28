@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>8080Assembler on The IMSAI Gang</title>
+    <link>/tags/8080assembler/</link>
+    <description>Recent content in 8080Assembler on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 02 Apr 2019 12:23:09 -0400</lastBuildDate><atom:link href="/tags/8080assembler/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GWASM - The 8080 Assembler</title>
+      <link>/posts/assembler/</link>
+      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/assembler/</guid>
+      <description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
+The finished assembler can be found on our Github repository
+Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
+Flex rules```%{ #include &amp;ldquo;helpers.</description>
+    </item>
+    
+  </channel>
+</rss>

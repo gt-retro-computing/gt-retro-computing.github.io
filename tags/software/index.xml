@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Software on The IMSAI Gang</title>
+    <link>/tags/software/</link>
+    <description>Recent content in Software on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Sep 2021 12:23:09 -0400</lastBuildDate><atom:link href="/tags/software/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FPGA: UART</title>
+      <link>/posts/fpga_uart/</link>
+      <pubDate>Sun, 05 Sep 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/fpga_uart/</guid>
+      <description>Now that we have a FPGA add in card, we can start to prototype some hardware using this FPGA. The FPGA we got has 15k logic elements, this should be plenty for us to implement many features at once.
+One of the first feature I&amp;rsquo;d like to implement is a reliable UART/serial communication card.
+Breakdown of the UART Controller  Parallel to serial converter (UART Tx side) Serial to parallel converter (UART Rx side) Interface with S100 Bus Control / Data registers for the serial  Implemeting the serial Tx side The goal here is to implement a TTL UART transimitter.</description>
+    </item>
+    
+    <item>
+      <title>LLVM Z80: Building</title>
+      <link>/posts/build_llvm/</link>
+      <pubDate>Mon, 30 Aug 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/build_llvm/</guid>
+      <description>Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&amp;gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&amp;#34;lld&amp;#34; -DLLVM_TARGETS_TO_BUILD=&amp;#34;&amp;#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&amp;#34;Z80&amp;#34; -DLLVM_ENABLE_PROJECTS=&amp;#34;clang&amp;#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &amp;quot;build&amp;quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code.</description>
+    </item>
+    
+    <item>
+      <title>LLVM For Dummies: (1)Intro &amp; Assembler</title>
+      <link>/posts/llvm_assembler/</link>
+      <pubDate>Tue, 06 Oct 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/posts/llvm_assembler/</guid>
+      <description>What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)</description>
+    </item>
+    
+    <item>
+      <title>CP/M 2.2 from scratch</title>
+      <link>/posts/cpm-boot-up/</link>
+      <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/cpm-boot-up/</guid>
+      <description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
+Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+    </item>
+    
+    <item>
+      <title>GWEMU - Intel 8080 Emulator</title>
+      <link>/posts/gwemu_emulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/gwemu_emulator/</guid>
+      <description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
+    </item>
+    
+    <item>
+      <title>GWASM - The 8080 Assembler</title>
+      <link>/posts/assembler/</link>
+      <pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/assembler/</guid>
+      <description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
+The finished assembler can be found on our Github repository
+Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
+Flex rules```%{ #include &amp;ldquo;helpers.</description>
+    </item>
+    
+    <item>
+      <title>Memory Dumper</title>
+      <link>/posts/memory_dumper/</link>
+      <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/memory_dumper/</guid>
+      <description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
+With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
+    </item>
+    
+    <item>
+      <title>Fibonacci! - First program!</title>
+      <link>/posts/first_program/</link>
+      <pubDate>Sat, 02 Feb 2019 12:08:13 -0500</pubDate>
+      
+      <guid>/posts/first_program/</guid>
+      <description>Computing the Fibonacci Series We have got the computer operational again. As of right now, everything essential is working again. The IMSAI 8080 come with a input and output both addressed on port 0xFF which maps to the higher 8 bits of address and the 8 led on the top left corner of the front panel.
+The first program we decided to run on the machine is to compute the fibonacci series and display them one at a time on the front panel led.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NewCard on The IMSAI Gang</title>
+    <link>/tags/newcard/</link>
+    <description>Recent content in NewCard on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 Apr 2022 03:00:00 -0400</lastBuildDate><atom:link href="/tags/newcard/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debugging the Cremenco TU-ART Card</title>
+      <link>/posts/cremenco_tuart_debugging/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/posts/cremenco_tuart_debugging/</guid>
+      <description>This is the first [and potentially the last :( ] time I am writing for this blog. I&amp;rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa.</description>
+    </item>
+    
+    <item>
+      <title>S100 FPGA and 16550 UART</title>
+      <link>/posts/fpga_16550uart/</link>
+      <pubDate>Mon, 30 Aug 2021 15:27:06 -0400</pubDate>
+      
+      <guid>/posts/fpga_16550uart/</guid>
+      <description>It has been a while since I&amp;rsquo;ve written on this blog. There has been quite a lot that has happened since my last update. One of the most recurring theme in this endavor on the retro computing has been constantly repairing old, unreliable circuits. Since now the focus has been slowly shifting to the software side, for the interest of providing a reliable platform for software debugging, I decided to deisng a S100 add-in card that features an FPGA.</description>
+    </item>
+    
+    <item>
+      <title>New SIO Compatable Serial Card</title>
+      <link>/posts/new_sio_compatable_serial_card/</link>
+      <pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+      
+      <guid>/posts/new_sio_compatable_serial_card/</guid>
+      <description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
+    </item>
+    
+    <item>
+      <title>Memory Dumper</title>
+      <link>/posts/memory_dumper/</link>
+      <pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/memory_dumper/</guid>
+      <description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
+With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
+    </item>
+    
+  </channel>
+</rss>

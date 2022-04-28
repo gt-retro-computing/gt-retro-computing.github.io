@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Code on The IMSAI Gang</title>
+    <link>/tags/code/</link>
+    <description>Recent content in Code on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 02 Feb 2019 12:08:13 -0500</lastBuildDate><atom:link href="/tags/code/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fibonacci! - First program!</title>
+      <link>/posts/first_program/</link>
+      <pubDate>Sat, 02 Feb 2019 12:08:13 -0500</pubDate>
+      
+      <guid>/posts/first_program/</guid>
+      <description>Computing the Fibonacci Series We have got the computer operational again. As of right now, everything essential is working again. The IMSAI 8080 come with a input and output both addressed on port 0xFF which maps to the higher 8 bits of address and the 8 led on the top left corner of the front panel.
+The first program we decided to run on the machine is to compute the fibonacci series and display them one at a time on the front panel led.</description>
+    </item>
+    
+  </channel>
+</rss>

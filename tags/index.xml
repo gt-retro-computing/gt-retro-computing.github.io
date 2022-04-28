@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on The IMSAI Gang</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 Apr 2022 03:00:00 -0400</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debugging</title>
+      <link>/tags/debugging/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/debugging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>FPGA</title>
+      <link>/tags/fpga/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/fpga/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hardware</title>
+      <link>/tags/hardware/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/hardware/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>IMSAI SIO</title>
+      <link>/tags/imsai-sio/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/imsai-sio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NewCard</title>
+      <link>/tags/newcard/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/newcard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>S100 SIO</title>
+      <link>/tags/s100-sio/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/s100-sio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SerialCard</title>
+      <link>/tags/serialcard/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/serialcard/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>UART</title>
+      <link>/tags/uart/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/tags/uart/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>LLVM</title>
+      <link>/tags/llvm/</link>
+      <pubDate>Sun, 05 Sep 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/llvm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Software</title>
+      <link>/tags/software/</link>
+      <pubDate>Sun, 05 Sep 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/tags/software/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

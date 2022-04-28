@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Floppy on The IMSAI Gang</title>
+    <link>/tags/floppy/</link>
+    <description>Recent content in Floppy on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 27 Nov 2019 00:00:00 -0400</lastBuildDate><atom:link href="/tags/floppy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tarbell MD1101 SSSD Floppy Controller</title>
+      <link>/posts/tarbell_md1101/</link>
+      <pubDate>Wed, 27 Nov 2019 00:00:00 -0400</pubDate>
+      
+      <guid>/posts/tarbell_md1101/</guid>
+      <description>MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&amp;quot; floppy drives.
+ The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run.</description>
+    </item>
+    
+  </channel>
+</rss>

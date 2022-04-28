@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta itemprop="name" content="LLVM Z80: Building">
+<meta itemprop="description" content="Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&#34;lld&#34; -DLLVM_TARGETS_TO_BUILD=&#34;&#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&#34;Z80&#34; -DLLVM_ENABLE_PROJECTS=&#34;clang&#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &quot;build&quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code."><meta itemprop="datePublished" content="2021-08-30T12:23:09-04:00" />
+<meta itemprop="dateModified" content="2021-08-30T12:23:09-04:00" />
+<meta itemprop="wordCount" content="222">
+<meta itemprop="keywords" content="Software,LLVM,Tutorial," /><meta property="og:title" content="LLVM Z80: Building" />
+<meta property="og:description" content="Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&#34;lld&#34; -DLLVM_TARGETS_TO_BUILD=&#34;&#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&#34;Z80&#34; -DLLVM_ENABLE_PROJECTS=&#34;clang&#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &quot;build&quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/build_llvm/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-30T12:23:09-04:00" />
+<meta property="article:modified_time" content="2021-08-30T12:23:09-04:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="LLVM Z80: Building"/>
+<meta name="twitter:description" content="Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&#34;lld&#34; -DLLVM_TARGETS_TO_BUILD=&#34;&#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&#34;Z80&#34; -DLLVM_ENABLE_PROJECTS=&#34;clang&#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &quot;build&quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>LLVM Z80: Building</title>
+	
+	<link rel="stylesheet" href="/css/style.min.c693329ce3bac2503f88115a4011a284a06d53e30f484562a37664dc4c5f0a74.css" integrity="sha256-xpMynOO6wlA/iBFaQBGihKBtU+MPSEVio3Zk3ExfCnQ=">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">The IMSAI Gang</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="/posts/">Posts</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/gt-retro-computing" target="_blank" rel="noopener" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Aug 30, 2021</span></div>
+				<h1>LLVM Z80: Building</h1>
+			</header>
+			<div class="content">
+				<h1 id="steps">Steps<a href="#steps" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<ol>
+<li>Clone the github repo (This is quite big, so make some disk space)</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/gt-retro-computing/llvm-project
+</span></span></code></pre></div><ol start="2">
+<li>Setup the cmake project by going into the <code>llvm</code> sub-directory and create a build directory</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ...../llvm-project/llvm&gt;</span>
+</span></span><span class="line"><span class="cl">mkdir cmake-build
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> cmake-build
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cmake -DLLVM_USE_LINKER<span class="o">=</span><span class="s2">&#34;lld&#34;</span> -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&#34;&#34;</span> -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&#34;Z80&#34;</span> -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&#34;clang&#34;</span> ../
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">make clang llvm-mc llc lld -j<span class="k">$(</span>nproc<span class="k">)</span>
+</span></span></code></pre></div><ol start="3">
+<li>
+<p>Step 2 will compile a clang for Z80 in the <code>&quot;build&quot;/bin</code> directory.
+P.S. Feel free to use an IDE like CLion, it <em>might</em> be very helpful when reading LLVM source code.</p>
+</li>
+<li>
+<p>You can try to compile a simple C program for example</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span> <span class="nf">testFn</span><span class="p">(</span><span class="kt">char</span> <span class="n">var1</span><span class="p">,</span> <span class="kt">char</span> <span class="n">var2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">var1</span> <span class="o">+</span> <span class="n">var2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Save it as <code>test.c</code> then you can do</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">clang --target<span class="o">=</span>z80-unknown-none-code16 -fintegrated-as -O3 -c -S -o - test.c
+</span></span></code></pre></div><p>It should output something like this</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">  <span class="na">.text</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.file</span> <span class="s">&#34;test.c&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.globl</span>  <span class="no">_testFn</span>                         <span class="c">; -- Begin function testFn
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">_testFn</span><span class="p">:</span>                                <span class="c">; @testFn
+</span></span></span><span class="line"><span class="cl"><span class="c">; %bb.0:                                ; %entry
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">ld</span>  <span class="no">l</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">a</span><span class="p">,</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add</span> <span class="no">a</span><span class="p">,</span> <span class="no">l</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ret</span>
+</span></span><span class="line"><span class="cl">                                        <span class="c">; -- End function
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="na">.addrsig</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">extern</span>  <span class="no">__Unwind_SjLj_Register</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">extern</span>  <span class="no">__Unwind_SjLj_Unregister</span>
+</span></span></code></pre></div><p>Compared to the same code generated by <code>sdcc</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">;test.c:1: char testFn(char var1, char var2) {
+</span></span></span><span class="line"><span class="cl"><span class="c">; ---------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c">; Function testFn
+</span></span></span><span class="line"><span class="cl"><span class="c">; ---------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">_testFn:</span>
+</span></span><span class="line"><span class="cl"><span class="c">;test.c:2: return var1 + var2;
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="nf">ld</span>  <span class="no">hl</span><span class="p">,</span> <span class="c">#3
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">add</span> <span class="no">hl</span><span class="p">,</span> <span class="no">sp</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">iy</span><span class="p">,</span> <span class="c">#2
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">add</span> <span class="no">iy</span><span class="p">,</span> <span class="no">sp</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">a</span><span class="p">,</span> <span class="mi">0</span> <span class="p">(</span><span class="no">iy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add</span> <span class="no">a</span><span class="p">,</span> <span class="p">(</span><span class="no">hl</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">l</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="c">;test.c:3: }
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="nf">ret</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_CODE</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_INITIALIZER</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_CABS</span> <span class="p">(</span><span class="no">ABS</span><span class="p">)</span>
+</span></span></code></pre></div>
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>Author: Codetector</p>
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/software">Software</a></span><span class="tag"><a href="/tags/llvm">LLVM</a></span><span class="tag"><a href="/tags/tutorial">Tutorial</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>222 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2021-08-30</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/fpga_16550uart/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>S100 FPGA and 16550 UART</span>
+			</a>
+			<a class="prev-post" href="/posts/llvm_assembler/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>LLVM For Dummies: (1)Intro &amp; Assembler</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2022 <a href="/">the IMSAI Gang</a></p>
+		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="/js/main.min.17d74807d860815985fea50c0164a0c132f23813ff704cf899739c92249d91e1.js" integrity="sha256-F9dIB9hggVmF/qUMAWSgwTLyOBP/cEz4mXOckiSdkeE="></script>
+
+</body>
+
+</html>

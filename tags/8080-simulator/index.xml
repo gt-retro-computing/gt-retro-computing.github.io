@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>8080 Simulator on The IMSAI Gang</title>
+    <link>/tags/8080-simulator/</link>
+    <description>Recent content in 8080 Simulator on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 27 Aug 2019 12:23:09 -0400</lastBuildDate><atom:link href="/tags/8080-simulator/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GWEMU - Intel 8080 Emulator</title>
+      <link>/posts/gwemu_emulator/</link>
+      <pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/gwemu_emulator/</guid>
+      <description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
+    </item>
+    
+  </channel>
+</rss>

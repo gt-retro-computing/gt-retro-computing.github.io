@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OS on The IMSAI Gang</title>
+    <link>/tags/os/</link>
+    <description>Recent content in OS on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 05 Oct 2019 12:23:09 -0400</lastBuildDate><atom:link href="/tags/os/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CP/M 2.2 from scratch</title>
+      <link>/posts/cpm-boot-up/</link>
+      <pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/cpm-boot-up/</guid>
+      <description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
+Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+    </item>
+    
+  </channel>
+</rss>

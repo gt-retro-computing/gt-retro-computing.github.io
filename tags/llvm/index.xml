@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LLVM on The IMSAI Gang</title>
+    <link>/tags/llvm/</link>
+    <description>Recent content in LLVM on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Sep 2021 12:23:09 -0400</lastBuildDate><atom:link href="/tags/llvm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FPGA: UART</title>
+      <link>/posts/fpga_uart/</link>
+      <pubDate>Sun, 05 Sep 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/fpga_uart/</guid>
+      <description>Now that we have a FPGA add in card, we can start to prototype some hardware using this FPGA. The FPGA we got has 15k logic elements, this should be plenty for us to implement many features at once.
+One of the first feature I&amp;rsquo;d like to implement is a reliable UART/serial communication card.
+Breakdown of the UART Controller  Parallel to serial converter (UART Tx side) Serial to parallel converter (UART Rx side) Interface with S100 Bus Control / Data registers for the serial  Implemeting the serial Tx side The goal here is to implement a TTL UART transimitter.</description>
+    </item>
+    
+    <item>
+      <title>LLVM Z80: Building</title>
+      <link>/posts/build_llvm/</link>
+      <pubDate>Mon, 30 Aug 2021 12:23:09 -0400</pubDate>
+      
+      <guid>/posts/build_llvm/</guid>
+      <description>Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&amp;gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&amp;#34;lld&amp;#34; -DLLVM_TARGETS_TO_BUILD=&amp;#34;&amp;#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&amp;#34;Z80&amp;#34; -DLLVM_ENABLE_PROJECTS=&amp;#34;clang&amp;#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &amp;quot;build&amp;quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code.</description>
+    </item>
+    
+    <item>
+      <title>LLVM For Dummies: (1)Intro &amp; Assembler</title>
+      <link>/posts/llvm_assembler/</link>
+      <pubDate>Tue, 06 Oct 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/posts/llvm_assembler/</guid>
+      <description>What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Repair on The IMSAI Gang</title>
+    <link>/tags/repair/</link>
+    <description>Recent content in Repair on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 05 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/repair/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Front Panel Broke Down: A Dead 74LS10</title>
+      <link>/posts/frontpanel_broke_down/</link>
+      <pubDate>Tue, 05 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/frontpanel_broke_down/</guid>
+      <description>Front panel repair During the process of testing the memory dumper card, we found some how the front panel is behaving weirdly.
+Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10 (Dual Tri-input NAND gates). Which controls the input switches.</description>
+    </item>
+    
+  </channel>
+</rss>

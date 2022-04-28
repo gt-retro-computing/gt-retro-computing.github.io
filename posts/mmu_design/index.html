@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta itemprop="name" content="The MMU - Part 1: Design and measure">
+<meta itemprop="description" content="Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. This is great solution for multiple programs competing for the same blocks of memory."><meta itemprop="datePublished" content="2019-03-01T12:08:13-05:00" />
+<meta itemprop="dateModified" content="2019-03-01T12:08:13-05:00" />
+<meta itemprop="wordCount" content="362">
+<meta itemprop="keywords" content="MMU,Hardware," /><meta property="og:title" content="The MMU - Part 1: Design and measure" />
+<meta property="og:description" content="Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. This is great solution for multiple programs competing for the same blocks of memory." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/mmu_design/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-03-01T12:08:13-05:00" />
+<meta property="article:modified_time" content="2019-03-01T12:08:13-05:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="The MMU - Part 1: Design and measure"/>
+<meta name="twitter:description" content="Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. This is great solution for multiple programs competing for the same blocks of memory."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>The MMU - Part 1: Design and measure</title>
+	
+	<link rel="stylesheet" href="/css/style.min.c693329ce3bac2503f88115a4011a284a06d53e30f484562a37664dc4c5f0a74.css" integrity="sha256-xpMynOO6wlA/iBFaQBGihKBtU+MPSEVio3Zk3ExfCnQ=">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">The IMSAI Gang</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="/posts/">Posts</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/gt-retro-computing" target="_blank" rel="noopener" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Mar 1, 2019</span></div>
+				<h1>The MMU - Part 1: Design and measure</h1>
+			</header>
+			<div class="content">
+				<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU<a href="#creating-an-memory-management-unit-for-the-8080-cpu" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<h2 id="background-and-theory">Background and Theory<a href="#background-and-theory" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>As part of the project goal is to get this IMSAI to run a modern operating system with 
+preemptive multitasking capabilities. A crucial component that is currently missing is the 
+<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. Having 
+the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. 
+This is great solution for multiple programs competing for the same blocks of memory. 
+In modern processors, the MMU is built as part of the CPU&rsquo;s architecture, so there are 
+instructions that support memory mapping operation as well as a mapping from the 
+memory map table. However, looking at the 8080, there is apparently no support for this at all.
+Therefore a solution to this problem is to &ldquo;expand&rdquo; the instruction set by using the <code>OUT</code> 
+instruction with specific address as a &rsquo;trap&rsquo; to address external hardware do the memory mapping.</p>
+<h2 id="implementation">Implementation<a href="#implementation" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>To implement this memory management scheme, we need to bridge the real memory and the CPU address 
+space with the MMU. Unfortunately, to achieve this we will be breaking the comparability with any 
+of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<p>The MMU will divide the entire address space (64K) of the CPU into 16 4K sized pages. 
+Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
+<p>To accomplish this mapping feature, the MMU has two on-board register file that contains 16 x 8bit 
+and 16 x4 bit registers. The 8 bit register file contains mapping to the physical address space. 
+The 4 bit register file contains read/write protection bits when operate in protection ring<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> 1.</p>
+<h3 id="known-limitations">Known limitations<a href="#known-limitations" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<h3 id="measurement-of-the-bus-status-during-different-instruction-cycles">Measurement of the BUS status during different instruction cycles<a href="#measurement-of-the-bus-status-during-different-instruction-cycles" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1"></p>
+<center>Scope Screenshot of the TODO cycle</center>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>Wikipedia: Memory Management Unit&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>It&rsquo;s not entirely true, as described in the memory map section.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>Author: Codetector</p>
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/mmu">MMU</a></span><span class="tag"><a href="/tags/hardware">Hardware</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>362 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-03-01</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/imsai_sio_debugging/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>IMSAI SIO Card Debugging</span>
+			</a>
+			<a class="prev-post" href="/posts/memory_dumper/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Memory Dumper</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2022 <a href="/">the IMSAI Gang</a></p>
+		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="/js/main.min.17d74807d860815985fea50c0164a0c132f23813ff704cf899739c92249d91e1.js" integrity="sha256-F9dIB9hggVmF/qUMAWSgwTLyOBP/cEz4mXOckiSdkeE="></script>
+
+</body>
+
+</html>

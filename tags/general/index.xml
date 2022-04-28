@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>General on The IMSAI Gang</title>
+    <link>/tags/general/</link>
+    <description>Recent content in General on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 01 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/general/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Power Up!</title>
+      <link>/posts/powerup/</link>
+      <pubDate>Fri, 01 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/powerup/</guid>
+      <description>The IMSAI 8080  TLDR; this post documents the IMSAI system as we got it.
+ Through the VIP program at Georgia Tech, we were able to acquire an IMSAI 8080 system to work on. Initially I had little to no knowledge about the IMSAI system. Through some quick web search we were able to find the manual for the computer and understand some history behind it.
+History The IMSAI 8080 is one of the first desktop computer at the time.</description>
+    </item>
+    
+  </channel>
+</rss>

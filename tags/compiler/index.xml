@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Compiler on The IMSAI Gang</title>
+    <link>/tags/compiler/</link>
+    <description>Recent content in Compiler on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 06 Oct 2020 00:00:00 -0400</lastBuildDate><atom:link href="/tags/compiler/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LLVM For Dummies: (1)Intro &amp; Assembler</title>
+      <link>/posts/llvm_assembler/</link>
+      <pubDate>Tue, 06 Oct 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/posts/llvm_assembler/</guid>
+      <description>What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)</description>
+    </item>
+    
+  </channel>
+</rss>

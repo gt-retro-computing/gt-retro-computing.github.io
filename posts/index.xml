@@ -1,0 +1,1096 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Posts on The IMSAI Gang</title>
+		<link>/posts/</link>
+		<description>Recent content in Posts on The IMSAI Gang</description>
+		<generator>Hugo -- gohugo.io</generator>
+		<language>en-us</language>
+		<lastBuildDate>Tue, 26 Apr 2022 03:00:00 -0400</lastBuildDate>
+		<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Debugging the Cremenco TU-ART Card</title>
+			<link>/posts/cremenco_tuart_debugging/</link>
+			<pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+			
+			<guid>/posts/cremenco_tuart_debugging/</guid>
+			<description>This is the first [and potentially the last :( ] time I am writing for this blog. I&amp;rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa.</description>
+			<content type="html"><![CDATA[<p>This is the first [and potentially the last :( ] time I am writing for this blog. I&rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.</p>
+<h2 id="background">Background</h2>
+<p>Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa.</p>
+<p>This greatly simplifies things for us, since we now have a way to plug in the Cremenco card straight into our laptop and using PuTTY, display the Serial output that CP/M will eventually display its output to and take keyboard input from.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/ftdi_pinout.png" alt="FTDI Pinout"></p>
+<h3 id="breakdown-of-cremenco-tu-art-card">Breakdown of Cremenco TU-ART Card</h3>
+<ul>
+<li>2 Parallel IO and 2 Serial IO ports. Serial IO are RS232C compatible</li>
+<li>Interrupt Capabilities: On board Priority Encoding, interrupt generation, interrupt acknowledgement, and daisy chaining expandability</li>
+</ul>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_board.png" alt="Cremenco TU-ART Board"></p>
+<p>Note the wires coming out of the board’s IC Sockets, and not out of the Jumper Header. FTDI works at 5V TTL levels, and these are the levels before it goes into the ICs [which are basically buffers] before being stepped up to 12V levels of the RS 232C standard. We removedd the ICs that were converting the TTL to RS232, and connected the right pins to our FTDI cable.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_ic_removed.png" alt="TU-ART IC Removed"></p>
+<h2 id="previous-iteration-of-ftdi-connection--mistakes">Previous Iteration of FTDI Connection (+ mistakes)</h2>
+<h3 id="connection-1">Connection 1:</h3>
+<p>Connection was made to Rx and Tx only. Rx of IMSAI was connected to Tx of FTDI. Tx of IMSAI was connected to Rx of FTDI.</p>
+<p><em>Feedback:</em></p>
+<p>This Connection was a mistake because</p>
+<ol>
+<li>
+<p>No GND connection was made.</p>
+</li>
+<li>
+<p>Rx and Tx were inverted. While a regular UART connection does require this inversion, the FTDI did this internally for us.</p>
+</li>
+</ol>
+<h3 id="connection-2">Connection 2:</h3>
+<p>Connection was made to Rx and Tx and GND. Rx of IMSAI was connected to Tx of FTDI. Tx of IMSAI was connected to Tx of FTDI.</p>
+<p><em>Feedback:</em></p>
+<ol>
+<li>This is the connection being used currently. While the connection does not work the way we expect it to, we are working on debugging this one.</li>
+</ol>
+<p><img src="/image/post/cremenco_tuart_debugging/ftdi_final_connection.png" alt="FTDI Final Connection"></p>
+<h3 id="change-in-connection-output">Change in connection output</h3>
+<p>The first issue noticed on Connection 1 was that there were visible signals rather than noise on the Oscilloscope output.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/connection1_oscilloscope_noise.png" alt="Connection 1 Oscilloscope Noise"></p>
+<p>There was a 60 Hz Disturbance on both lines, which eventually turned out to be caused by the transformer over which the wire was running. Since all 3 wires were near the transformer, the disturbance would affect all 3 relatively the same way, and therefore would cancel out since the ground picked up the same noise all the other wires were picking up.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/connection2_inconsistent_voltage.png" alt="Connection 2 Inconsistent Voltage"></p>
+<p>However, one thing that was noticed was that the oscilloscope was interfering with the Serial communication between the 2 devices, and so had to be removed to continue.</p>
+<p>There were inconsistencies with the voltage levels (typically, they are driven to 5V, but here they seemed to be driven to just 230 mV, which I felt was the next issue we should look at debugging).</p>
+<h2 id="driver-code-for-the-tu-art">Driver Code for the TU-ART</h2>
+<p>The reason why the TTL logic signals were not correct was because the card had not been reset after the IMSAI boots up, and hence it was not driving any signal on the output wires. We pulled up some of the example code from the TU-ART documentation and began using that as a reference to write some driver code to reset the TU-ART and try and write bytes to a PuTTY shell on our laptop.</p>
+<h3 id="driver-code-iteration-1---simple-write">Driver Code Iteration 1 - Simple Write</h3>
+<p>Using <em><strong>Appendix A</strong></em> as a starting point, an attempt was made to transmit data to a PuTTY terminal. The terminal did not receive any data, and ghost bytes [0x00 or null] were logged by PuTTY on every program reset while the program was running. This was not the desired output.</p>
+<p>The program pointed out an issue: The device had its TBE bit set to 0 when the status register was read. This meant that the device was not ready to read, even though we had just reset it, which would case that bit to be set high.</p>
+<p>The Program was modified by me to the one in Appendix B. This program was then run. Upon user intervention, it was noticed that:</p>
+<ol>
+<li>
+<p>TBE is still not set – the device is still not ready to transfer data!</p>
+</li>
+<li>
+<p>RDA is set – The device wants us to read data instead!</p>
+</li>
+</ol>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_status_bits.png" alt="TUART Status Bits">
+<img src="/image/post/cremenco_tuart_debugging/imsai_rda_output.png" alt="IMSAI RDA Output"></p>
+<p>Note that the Front Panel Display byte (updated through a <code>OUT 0xFF</code>) shows the bits inverted. This was because it was easier to have those LEDs pulled down when HIGH. However this is only applicable for the <code>OUT 0xFF</code> LED display. All other LED displays on the front panel [the data and address buses] show the bits as they are.</p>
+<h3 id="driver-code-iteration-2---greedy-read">Driver Code Iteration 2 - Greedy Read</h3>
+<p>We handled this by letting the user intervene, allow the program to read some data, and then continue.
+Code in <strong>Appendix B</strong> shows the modified assembly.</p>
+<p>On my first try after this intervention was added, the device read the initial byte, and then the TBE bit was set to 1! This showed the data we were outputting on the IMSAI front panel, 0x88. However, there was still no transmission seen on the PuTTY terminal.
+Unfortunately, this was not reproducible. This happened only 3 times after, before it just stopped setting TBE status bit high. There was no change made to hardware, we were just uploading software to the device and restarting.</p>
+<h3 id="driver-code-iteration-3---rda-debugger">Driver Code Iteration 3 - RDA Debugger</h3>
+<p>Finally, I decided to try and see what the data the TU-ART was asking us to read. Was the card trying to give us some initial data? Was there some data transmitted by my laptop that I had to process? I updated the code to automatically display all RDA bytes it reads, and have the user verify each byte.</p>
+<p>When this program was run, the exact same byte was read: 0x40.
+This also corresponds to a status byte indicating an RDA. This was confusing. Initially, I thought the display was not updating properly after the status byte had been displayed, but this was soon disproved by checking the IMSAI front panel using <em>single step</em> instead of <em>run</em> to run programs.</p>
+<p>The thing is, when single stepping a program on the front panel, if you encounter an <code>IN</code> or <code>OUT</code> instruction, the IMSAI will actually show you the byte being read into or from the <em>accumulator (A)</em> register.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/0x40_byte_verification_data_bus.png" alt="0x40 Byte Verification on Data Bus"></p>
+<p>This meant that when I ran the <code>IN</code> instruction to read a received byte from the TU-ART, it was indeed returning 0x40 to the IMSAI.</p>
+<p>At this point, I reached the conclusion that the TU-ART board is not working as it should. I would most likely attribute this to a hardware defect, maybe an IC on the board had been burned out? We can rule out faulty connections on the board, since I had continuity checked all the different components, and even checked resistances and capacitances.</p>
+<p>The device does reset successfully. It was able to drive the Serial connection lines to around <em>4.5V</em>, which is the desired behaviour. 
+The perpetual 0x40 byte, that does not reset the RDA status bit is indicates that there is something on the board not working as expected.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The conclusion was reached that we need to try and use a different UART board on the IMSAI, and Professor Lanterman just pinged us a couple hours ago that the new ones he had ordered have arrived! Hopefully one of those has better success!</p>
+<h2 id="appendix">Appendix</h2>
+<h3 id="appendix-a-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board--original">Appendix A [Simple Prorgam to I/O via Serial Port A on Cremenco TU-ART board – original]</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">; Adapated from Programming Examples in:
+</span></span></span><span class="line"><span class="cl"><span class="c">; http://www.s100computers.com/Hardware%20Manuals/Cromemco/Cromemco%20TU-ART%20Manual.pdf
+</span></span></span><span class="line"><span class="cl"><span class="c">; Calvin Khiddee-Wu
+</span></span></span><span class="line"><span class="cl"><span class="c">; 4/10/22
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Send character output
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">outchar:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ani</span> <span class="no">TBE</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jz</span> <span class="no">outchar</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="mi">0xFF</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jp</span> <span class="no">outchar</span>
+</span></span></code></pre></div><h3 id="appendix-b-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board---modified">Appendix B [Simple Prorgam to I/O via Serial Port A on Cremenco TU-ART board - modified]</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">; Adapated from Programming Examples in:
+</span></span></span><span class="line"><span class="cl"><span class="c">; http://www.s100computers.com/Hardware%20Manuals/Cromemco/Cromemco%20TU-ART%20Manual.pdf
+</span></span></span><span class="line"><span class="cl"><span class="c">; and from a similar program authored by Calvin Khiddee-Wu
+</span></span></span><span class="line"><span class="cl"><span class="c">; Ananay Gupta
+</span></span></span><span class="line"><span class="cl"><span class="c">; 4/11/22
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">RDA</span><span class="p">:</span>   <span class="no">equ</span> <span class="mi">40</span><span class="no">H</span>     <span class="c">; Read Data available
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Send character output
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">outchar:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">and</span> <span class="no">TBE</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">cp</span> <span class="no">TBE</span>        <span class="c">; check for a TBE, if one exits, wait for user to intervene
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">END</span>  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="no">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span> 
+</span></span><span class="line"><span class="cl">        <span class="no">and</span> <span class="no">RDA</span>       <span class="c">; check if data is available to be read. if there is, wait for user to intervene
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">END</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="mi">88</span><span class="no">H</span>       <span class="c">; we want to transmit 0x88
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">out</span> <span class="mi">0</span><span class="no">FFH</span><span class="p">,</span> <span class="no">a</span>   <span class="c">; sanity check: display to front panel LEDs
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="no">out</span> <span class="no">ADATA</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; output as data from Serial output A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="no">jp</span> <span class="no">outchar</span>      <span class="c">; loop
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">END:</span>
+</span></span><span class="line"><span class="cl"><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="mi">0</span><span class="no">FFH</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="mi">0</span><span class="no">f0h</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cp</span> <span class="mi">0</span><span class="no">F0H</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">outchar</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">end</span>
+</span></span></code></pre></div><h3 id="appendix-c-program-to-readwrite-bytes-and-manually-control-bytes-via-serial-port-a-on-cremenco-tu-art">Appendix C [Program to Read/Write bytes and manually control bytes via Serial Port A on Cremenco TU-ART]</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">RDA</span><span class="p">:</span>   <span class="no">equ</span> <span class="mi">40</span><span class="no">H</span>     <span class="c">; Read Data available
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">DISP:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">FFH</span>
+</span></span><span class="line"><span class="cl"><span class="nl">STACK:</span> <span class="nf">equ</span> <span class="mi">200</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>    <span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">out</span> <span class="mi">0xFF</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ld</span> <span class="no">SP</span><span class="p">,</span> <span class="no">STACK</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">b</span><span class="p">,</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl"><span class="nl">START:</span> <span class="c">; outputs status byte and waits for user to confirm that they have seen it
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="no">DISP</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">call</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">READ</span> <span class="c">; read next received byte
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">READ:</span> <span class="c">; outputs byte read from TU-ART and waits for user to confirm that they have seen it
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="no">DISP</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">call</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">START</span> <span class="c">; read status byte
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">INPLOOP:</span> <span class="c">; waits for user to complain that they have seen the byte that is on the display and returns
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">DISP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cp</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">RETURN</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nl">RETURN:</span>
+</span></span><span class="line"><span class="cl"><span class="nf">inc</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ret</span>
+</span></span></code></pre></div>]]></content>
+		</item>
+		
+		<item>
+			<title>FPGA: UART</title>
+			<link>/posts/fpga_uart/</link>
+			<pubDate>Sun, 05 Sep 2021 12:23:09 -0400</pubDate>
+			
+			<guid>/posts/fpga_uart/</guid>
+			<description>Now that we have a FPGA add in card, we can start to prototype some hardware using this FPGA. The FPGA we got has 15k logic elements, this should be plenty for us to implement many features at once.
+One of the first feature I&amp;rsquo;d like to implement is a reliable UART/serial communication card.
+Breakdown of the UART Controller  Parallel to serial converter (UART Tx side) Serial to parallel converter (UART Rx side) Interface with S100 Bus Control / Data registers for the serial  Implemeting the serial Tx side The goal here is to implement a TTL UART transimitter.</description>
+			<content type="html"><![CDATA[<p>Now that we have a FPGA add in card, we can start to prototype some hardware using 
+this FPGA. The FPGA we got has 15k logic elements, this should be plenty for us to 
+implement many features at once.</p>
+<p>One of the first feature I&rsquo;d like to implement is a reliable UART/serial communication
+card.</p>
+<h2 id="breakdown-of-the-uart-controller">Breakdown of the UART Controller</h2>
+<ul>
+<li>Parallel to serial converter (UART Tx side)</li>
+<li>Serial to parallel converter (UART Rx side)</li>
+<li>Interface with S100 Bus</li>
+<li>Control / Data registers for the serial</li>
+</ul>
+<h3 id="implemeting-the-serial-tx-side">Implemeting the serial Tx side</h3>
+<p>The goal here is to implement a TTL UART transimitter. TTL UART is rather simple to
+implement, the line toggle once per bit (at the bit rate frequency). The line normally
+idle at high logic level, and drops down for 1 cycle (1 start bit), then send the 8 
+bits followed by 1 cycle high (stop bit). This can be implemented by a simple state 
+machine.</p>
+<p>You can find the implementation code <a href="https://github.com/gt-retro-computing/IMSAI_FPGA_HDL/blob/master/rtl/uart/uart_tx.sv">here</a>.</p>
+<p>The module is designed so that the transimitter can run at a different clock than the 
+control interface module. This is important, because very likely the bitrate of the 
+UART will not be the clock speed at which the majority of the design will be running 
+at. The CDC(clock domain crossing) is handled by using a hand-shake method.</p>
+<p>The controller can simply put the data on the bus, then signal the wr (write) wire. 
+The data / write can be deasserted as soon as the tx module respond with the ack 
+signal. After detecting the ack signal, the master can assert the ack_clr signal to 
+show that it has recieved the ack. The tx module then becomes ready to recieve the 
+next byte.</p>
+<p>This can be seen from the following simulation capture showing the transimitter 
+sending an &lsquo;0x5A&rsquo; byte. (The yellow waveform is the TTL serial). 
+<img src="/image/post/fpga_uart/GTKWave_sim.png" alt="Simulation Capture of Tx"></p>
+<p>Also the module work on real hardware, here&rsquo;s a scope capture of it sending the same 
+&lsquo;0x5A&rsquo; byte at 115200 baud.</p>
+<p><img src="/image/post/fpga_uart/DS1Z_QuickPrint2.png" alt="Scope Capture of Tx"></p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>S100 FPGA and 16550 UART</title>
+			<link>/posts/fpga_16550uart/</link>
+			<pubDate>Mon, 30 Aug 2021 15:27:06 -0400</pubDate>
+			
+			<guid>/posts/fpga_16550uart/</guid>
+			<description>It has been a while since I&amp;rsquo;ve written on this blog. There has been quite a lot that has happened since my last update. One of the most recurring theme in this endavor on the retro computing has been constantly repairing old, unreliable circuits. Since now the focus has been slowly shifting to the software side, for the interest of providing a reliable platform for software debugging, I decided to deisng a S100 add-in card that features an FPGA.</description>
+			<content type="html"><![CDATA[<p>It has been a while since I&rsquo;ve written on this blog. 
+There has been quite a lot that has happened since my last update. 
+One of the most recurring theme in this endavor on the retro computing
+has been constantly repairing old, unreliable circuits. Since now the 
+focus has been slowly shifting to the software side, for the interest 
+of providing a reliable platform for software debugging, I decided to 
+deisng a S100 add-in card that features an FPGA.</p>
+<h2 id="design-goals">Design Goals</h2>
+<p>Some of the main goal of this FPGA add-in card is to be able to provide a reliable way of emulating any hardware, let it be existing 
+retro hardware or anything we are about to design. It turns out having
+an FPGA at your disposal really aids in accelerating the design and 
+revision process. Here are some of the requirement we set when 
+designing this AIC (add-in card).</p>
+<ul>
+<li>Have access to the entire S100 bus and it&rsquo;s signals.</li>
+<li>Able to respond to IO reuqests as well as Memory requests.</li>
+<li>Ability to issue interrupt to the CPU.</li>
+<li>Efficient power regulation (aka not 7805s)</li>
+</ul>
+<h2 id="implementation">Implementation</h2>
+<p><img src="/image/post/fpga_16550/fpga_card.jpg" alt="FPGA Card"></p>
+<p>In the above picture, you can see the first implementation of this 
+design. As most electronic designs are, this first revision is flawed 
+in a few ways (as indicated by the patch wires haha). On the left side 
+of the board, it is a 16550 UART and supporting circutry for it to 
+work in a S100 computer. 16550 became the standard UART chip that can 
+even be commonly found in modern computers and various micro 
+controllers.</p>
+<p>On the bottom left corner of the board, you can see the voltage 
+regulation section of the board. Where there are a few sets of power 
+regulation system that derive a regulated +5V and +3.3V for various 
+component on the board from the unregulated +8V rail on the S100 bus.</p>
+<p>On the right side of the board, you can see the main component, the 
+FPGA daughter board. Due to the flexibility nature of FPGA, even if in 
+the future this specific FPGA is not availiable anymore, you can very 
+easily design an adapter / redesign the board without much effort to 
+adapt it for another FPGA.</p>
+<h2 id="ending">Ending</h2>
+<p>I think it would be very interesting to see where this addition to the 
+IMSAI can take us. Now having the ability to quickly prototype and 
+potentially debug other hardware on the bus, this FPGA should give us 
+some big help in the future.</p>
+<h2 id="stuff-might-be-cool-to-implement-with-this-card">Stuff might be cool to implement with this card</h2>
+<ol>
+<li>Banked memory support</li>
+<li>S100 Bus recording / dumping tool. Like a logic analyzer.</li>
+<li>Co-Processor (idk something like a tiny RISCV core could be fun)</li>
+<li>DMA Engine (I think this is possible with the current board design, but should verify).</li>
+<li>Graphics Engine / VGA.</li>
+</ol>
+]]></content>
+		</item>
+		
+		<item>
+			<title>LLVM Z80: Building</title>
+			<link>/posts/build_llvm/</link>
+			<pubDate>Mon, 30 Aug 2021 12:23:09 -0400</pubDate>
+			
+			<guid>/posts/build_llvm/</guid>
+			<description>Steps  Clone the github repo (This is quite big, so make some disk space)  git clone https://github.com/gt-retro-computing/llvm-project Setup the cmake project by going into the llvm sub-directory and create a build directory  # ...../llvm-project/llvm&amp;gt; mkdir cmake-build cd cmake-build cmake -DLLVM_USE_LINKER=&amp;#34;lld&amp;#34; -DLLVM_TARGETS_TO_BUILD=&amp;#34;&amp;#34; -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=&amp;#34;Z80&amp;#34; -DLLVM_ENABLE_PROJECTS=&amp;#34;clang&amp;#34; ../ make clang llvm-mc llc lld -j$(nproc)  Step 2 will compile a clang for Z80 in the &amp;quot;build&amp;quot;/bin directory. P.S. Feel free to use an IDE like CLion, it might be very helpful when reading LLVM source code.</description>
+			<content type="html"><![CDATA[<h1 id="steps">Steps</h1>
+<ol>
+<li>Clone the github repo (This is quite big, so make some disk space)</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/gt-retro-computing/llvm-project
+</span></span></code></pre></div><ol start="2">
+<li>Setup the cmake project by going into the <code>llvm</code> sub-directory and create a build directory</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ...../llvm-project/llvm&gt;</span>
+</span></span><span class="line"><span class="cl">mkdir cmake-build
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> cmake-build
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cmake -DLLVM_USE_LINKER<span class="o">=</span><span class="s2">&#34;lld&#34;</span> -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&#34;&#34;</span> -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&#34;Z80&#34;</span> -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&#34;clang&#34;</span> ../
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">make clang llvm-mc llc lld -j<span class="k">$(</span>nproc<span class="k">)</span>
+</span></span></code></pre></div><ol start="3">
+<li>
+<p>Step 2 will compile a clang for Z80 in the <code>&quot;build&quot;/bin</code> directory.
+P.S. Feel free to use an IDE like CLion, it <em>might</em> be very helpful when reading LLVM source code.</p>
+</li>
+<li>
+<p>You can try to compile a simple C program for example</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span> <span class="nf">testFn</span><span class="p">(</span><span class="kt">char</span> <span class="n">var1</span><span class="p">,</span> <span class="kt">char</span> <span class="n">var2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">var1</span> <span class="o">+</span> <span class="n">var2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Save it as <code>test.c</code> then you can do</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">clang --target<span class="o">=</span>z80-unknown-none-code16 -fintegrated-as -O3 -c -S -o - test.c
+</span></span></code></pre></div><p>It should output something like this</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">  <span class="na">.text</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.file</span> <span class="s">&#34;test.c&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.globl</span>  <span class="no">_testFn</span>                         <span class="c">; -- Begin function testFn
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">_testFn</span><span class="p">:</span>                                <span class="c">; @testFn
+</span></span></span><span class="line"><span class="cl"><span class="c">; %bb.0:                                ; %entry
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">ld</span>  <span class="no">l</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">a</span><span class="p">,</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add</span> <span class="no">a</span><span class="p">,</span> <span class="no">l</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ret</span>
+</span></span><span class="line"><span class="cl">                                        <span class="c">; -- End function
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="na">.addrsig</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">extern</span>  <span class="no">__Unwind_SjLj_Register</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">extern</span>  <span class="no">__Unwind_SjLj_Unregister</span>
+</span></span></code></pre></div><p>Compared to the same code generated by <code>sdcc</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">;test.c:1: char testFn(char var1, char var2) {
+</span></span></span><span class="line"><span class="cl"><span class="c">; ---------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c">; Function testFn
+</span></span></span><span class="line"><span class="cl"><span class="c">; ---------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">_testFn:</span>
+</span></span><span class="line"><span class="cl"><span class="c">;test.c:2: return var1 + var2;
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="nf">ld</span>  <span class="no">hl</span><span class="p">,</span> <span class="c">#3
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">add</span> <span class="no">hl</span><span class="p">,</span> <span class="no">sp</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">iy</span><span class="p">,</span> <span class="c">#2
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="no">add</span> <span class="no">iy</span><span class="p">,</span> <span class="no">sp</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">a</span><span class="p">,</span> <span class="mi">0</span> <span class="p">(</span><span class="no">iy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add</span> <span class="no">a</span><span class="p">,</span> <span class="p">(</span><span class="no">hl</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ld</span>  <span class="no">l</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="c">;test.c:3: }
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>  <span class="nf">ret</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_CODE</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_INITIALIZER</span>
+</span></span><span class="line"><span class="cl">  <span class="na">.area</span> <span class="no">_CABS</span> <span class="p">(</span><span class="no">ABS</span><span class="p">)</span>
+</span></span></code></pre></div>]]></content>
+		</item>
+		
+		<item>
+			<title>LLVM For Dummies: (1)Intro &amp; Assembler</title>
+			<link>/posts/llvm_assembler/</link>
+			<pubDate>Tue, 06 Oct 2020 00:00:00 -0400</pubDate>
+			
+			<guid>/posts/llvm_assembler/</guid>
+			<description>What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)</description>
+			<content type="html"><![CDATA[<h1 id="what-is-llvm-and-why">What is LLVM and why?</h1>
+<blockquote>
+<p>The <strong>LLVM</strong> <a href="https://en.wikipedia.org/wiki/Compiler">compiler</a> infrastructure project is a set of compiler and <a href="https://en.wikipedia.org/wiki/Toolchain">toolchain</a> technologies,[<a href="https://en.wikipedia.org/wiki/LLVM#cite_note-4">4]</a> which can be used to develop a <a href="https://en.wikipedia.org/wiki/Compiler#Front_end">front end</a> for any <a href="https://en.wikipedia.org/wiki/Programming_language">programming language</a> and a <a href="https://en.wikipedia.org/wiki/Compiler#Back_end">back end</a> for any <a href="https://en.wikipedia.org/wiki/Instruction_set_architecture">instruction set architecture</a>. LLVM is designed around a <a href="https://en.wikipedia.org/wiki/Language-independent_specification">language-independent</a> <a href="https://en.wikipedia.org/wiki/Intermediate_representation">intermediate representation</a> that serves as a <a href="https://en.wikipedia.org/wiki/Software_portability">portable</a>, high-level <a href="https://en.wikipedia.org/wiki/Assembly_language">assembly language</a> that can be <a href="https://en.wikipedia.org/wiki/Optimizing_compiler">optimized</a> with a variety of transformations over multiple passes. (Wikipedia)</p>
+</blockquote>
+<p>So they why actually comes from the goal of this bigger restoration project which includes writing a modern multi-tasking operating system for the Intel 8080 microprocessor. Due to the limited amount of memory and releativly low speed, we would like our OS code to be compiled as efficient as possible. In order to achieve efficient complication, we decied to port a existing compiler to the Intel 8080. LLVM is just the right portable framework for such a compiler.</p>
+<h1 id="but-how">But How?</h1>
+<p>if you just go out and checkout (or download) the LLVM source tree from GitHub right now, you will soon realize that it is a massive project, and there are not much documentation to help you get started on porting it into a new platfom (Target).</p>
+<p><a href="https://github.com/llvm/llvm-project">LLVM master branch GitHub mirror repository</a></p>
+<p>So through this series of posts we will try out best to describe the process of porting LLVM to a new architecture, as well as the &ldquo;hoops&rdquo; we had to jump through in order to make progress. This is meant to be for beginners, as we started with just about zero knowledge on LLVM.</p>
+<h1 id="llvm-whats-special-about-it">LLVM? What&rsquo;s special about it?</h1>
+<p>Before we jump into building a backend for LLVM that targets an architechture we want, I want to describe on a very high level how does LLVM turn your high level programming language into machine code</p>
+<p>The concept of LLVM is that instead of building multiple compilers for each language and target, we can seperate the langauge sepecific part (Front end) and the machine specific part (Backend). With this approach, we can change the process of building compilers O(n^2) to O(2n).</p>
+<h1 id="building-a-backend">Building a backend</h1>
+<p>In this series we will slowly cover how to use the LLVM Compiler Infrastrucutre. We will start by building a new backend that targets the famouz Zilog Z80 processor.</p>
+<p>In order to make our backend easy to test, we will start by building a assembler. Strictly saying this is not nessrary unless you are planing on either using the LLVM assembler (llvm-mc) or supporting inline assembly, but I found that starting from a assembler is usually the best place to start a new backend. Since by creating the assembler you will have the opportiunity to describe all the instructions that the architecture support without having to worry about instruction selection.</p>
+<p>Also note that this will be a big theme throughout this series,  where we will try to keep the project in a &ldquo;building&rdquo; state, which means you can build and test your progress along the way. I personally find being able to see incremental progress very important to 1) find error early on and 2) motivate me to keep continue working on it.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Tarbell MD1101 SSSD Floppy Controller</title>
+			<link>/posts/tarbell_md1101/</link>
+			<pubDate>Wed, 27 Nov 2019 00:00:00 -0400</pubDate>
+			
+			<guid>/posts/tarbell_md1101/</guid>
+			<description>MD1101 Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&amp;quot; floppy drives.
+ The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run.</description>
+			<content type="html"><![CDATA[<h1 id="md1101">MD1101</h1>
+<p>Our machine came with a Tarbell MD1101 Single Side Single Density (SSSD) floppy drive controller along with 2 8&quot; floppy drives.</p>
+<blockquote>
+<p>The Tarbell Floppy Disk Interface was a programmed-data-transfer (not DMA) device utilizing Port I/O, similar for example to the SD Systems Versafloppy boards. It was designed to work with a variety of standard-size floppy disk drives. It includes a 32-byte ROM bootstrap program, which was automatically enabled when the computer RESET button was pushed, and which switched itself out after the bootstrap had run. In this way, no part of the computer 64K of memory needed to be dedicated to Read-Only-Memory (ROM). <br>
+The interface ran at the standard speed of 250,000 bits per second, and the normal formatted capacity per diskette of 256 kilobytes. Places for two connectors were provided on the board.</p>
+</blockquote>
+<h1 id="documentation-typo">Documentation Typo</h1>
+<p>The WD1771 chip used by the card actually does not support multi-drive configuration. The card used a 74LS175 Quad D Flip-Flop to select between up to four drives. Drive select only use 2 of the 4 bits in the flip-flop, the other 2 seems to be releatively undocumented. However, the provided sample code for selecting drive would not work. It would cause any subsquent input from the controller to hang the CPU. (Stuck in <code>IN DWAIT</code>)</p>
+<p>After a lot of trail and error along with reading the tiny text schematics, we are able to narrow the problem downto that the code is incorrectly setting one of the bit on the Flip Flop. Effectively disabling the controller interrupt request handling thus causing it to hang forever.</p>
+<h2 id="modified-code-listing">Modified Code Listing</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">SELECT_DIRVE:</span>
+</span></span><span class="line"><span class="cl"><span class="c">;Select drive in register C
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">MOV</span> <span class="no">A</span><span class="p">,</span> <span class="no">C</span> <span class="c">; Move drive number to A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">CMA</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ANI</span> <span class="mi">3</span> <span class="c">;Limit drive selection to only 0-3
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span><span class="p">!</span> <span class="no">RAL</span> <span class="c">;shift left by 4
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ORI</span> <span class="mi">0x82</span> <span class="c">;MODIFIED: original is 0x2
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">OUT</span> <span class="no">DEXT</span>
+</span></span><span class="line"><span class="cl"><span class="nf">RET</span> <span class="c">;return from subroutine
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="p">---</span>
+</span></span></code></pre></div><h1 id="525-drive-mod">5.25&quot; Drive Mod</h1>
+<p>In addition to the 8&quot; drives, we also happen to have a few 5.25&quot; 
+drive on hand. that we would like to operate as well. Upon close inspection, the 5.25&quot; and 8&quot; (Shugart 801) interface are not very different from eachother. The only difference being the 5.25&quot; drives has a Motor Enable line in lieu of a Head Load (This is due the the difference in physical construction of the drive.) But I think it is okay to subsitute the signal. Since if achieve the same effect which is to <em>begin</em> reading the diskett. Conviently the board has a free 40 pin mounting hole for a additional 2 8&quot; drive. We decided to use this connector for our 5.25&quot; drive header. This required a lot of jumper wires (All the blue mod wires below).</p>
+<h2 id="drive-pin-mapping">Drive Pin Mapping</h2>
+<p>The pads are labeled across the MD1101 board and are listed with their corresponding name here. 
+They must be wired to the corresponding &ldquo;Mapped To&rdquo; pins on the 5.25&quot; floppy drive.</p>
+<table>
+<thead>
+<tr>
+<th>Pad</th>
+<th>Name</th>
+<th>Mapped To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E23</td>
+<td>DS0*</td>
+<td>16 (motor en. B)</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>INDX0*</td>
+<td>8 (index)</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>RDY0*</td>
+<td>34 (ready)</td>
+</tr>
+<tr>
+<td>E19</td>
+<td>HLD0*</td>
+<td></td>
+</tr>
+<tr>
+<td>E20</td>
+<td>HLD1*</td>
+<td></td>
+</tr>
+<tr>
+<td>E17</td>
+<td>HLD2*</td>
+<td>12 (drive sel. B)</td>
+</tr>
+<tr>
+<td>E25</td>
+<td>HLD3*</td>
+<td></td>
+</tr>
+<tr>
+<td>E22</td>
+<td>SO*</td>
+<td>18 (direction)</td>
+</tr>
+<tr>
+<td>E21</td>
+<td>SI*</td>
+<td>20 (step)</td>
+</tr>
+<tr>
+<td>E15</td>
+<td>WD*</td>
+<td>22</td>
+</tr>
+<tr>
+<td>E16</td>
+<td>WG*</td>
+<td>24</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>TR00*</td>
+<td>26 (sense track zero)</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>WRPT0*</td>
+<td>28</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>RDAT0*</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pictures">Pictures</h2>
+<p><img src="/image/post/md1101/board_mod.jpeg" alt="MD 1101 board after 5.25&quot; mod"></p>
+<center>MD 1101 board after 5.25" mod</center>
+<p><img src="/image/post/md1101/setup.jpeg" alt="Overall Machine Setup"></p>
+<center>Overall Machine Setup</center>]]></content>
+		</item>
+		
+		<item>
+			<title>CP/M 2.2 from scratch</title>
+			<link>/posts/cpm-boot-up/</link>
+			<pubDate>Sat, 05 Oct 2019 12:23:09 -0400</pubDate>
+			
+			<guid>/posts/cpm-boot-up/</guid>
+			<description>CP/M 2.2 CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.
+Getting the CP/M Boot disk With some quick research, it&amp;rsquo;s not hard to find that instead of having a &amp;ldquo;generic&amp;rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration.</description>
+			<content type="html"><![CDATA[<h1 id="cpm-22">CP/M 2.2</h1>
+<p>CP/M was the state-of-art operating system for home computers of the era. As CP/M is designed for this machine, we thought it might be helpful to be able to run the CP/M OS before we start writing our own.</p>
+<h2 id="getting-the-cpm-boot-disk">Getting the CP/M Boot disk</h2>
+<p>With some quick research, it&rsquo;s not hard to find that instead of having a &ldquo;generic&rdquo; CP/M boot disk, you are suppose to have a customized version of the boot disk specifically designed for your machine configuration. It&rsquo;s natural to come to the question of how would we obtain this disk. As according to the manual, the first step of creating such a disk is to have a machine that can run CP/M which unfortunately we don&rsquo;t have.</p>
+<h2 id="starting-from-nothing-to-cpm-bootup">Starting from nothing to CP/M Bootup</h2>
+<p>As discussed above, we can not go through the steps described in the manual to obtain a working copy of CP/M for our IMSAI. So we have to find out some other creative solutions. Fortunately, we are able to find a copy of a disassembled CP/M operating system. Combining this with out memory dumper card, we should be able to dump this CP/M directly to memory and start from there.</p>
+<h3 id="cbios-custom-basic-io-system">CBIOS (Custom Basic I/O System)</h3>
+<p>CBIOS is the part of CP/M that differs from system to system, it is the part that the user have to create / modify to suite their specific system needs. We started by implementing the various routines described in the CP/M manual.</p>
+<h3 id="loading-cpm">Loading CP/M</h3>
+<p>After having the CBIOS written, we can simply dump the CP/M memory image then the assembled CBIOS after hitting reset and run, we are up and running in CP/M</p>
+<h2 id="creating-a-boot-disk">Creating a boot disk</h2>
+<p>Now that we have a working version of CP/M, the next step is to bootstrap itself so we can perform a cold start without the aid of modern hardware like the memory dumper.</p>
+<p>At this point, all we need to do is to implement a program called save_cpm, that reads the memory image, along with our CBIOS and write to floppy disk between track 1 and 2. (Note, leave track 1, sector 0 empty for bootstrap loader we will talk about in the next section).</p>
+<h2 id="bootstrap-loader">Bootstrap loader</h2>
+<p>The floppy controller we have right now have a &ldquo;phantom&rdquo; ROM that is able to load the track 1, sector 0 of floppy disk to memory and then execute it. We are going to use this hardware feature now to load a very short program (as one sector is only 128 bytes) that is able to load the rest of CP/M. This will be our COLD_BOOT subroutine.</p>
+<h1 id="demo-time">Demo time!</h1>
+<center>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/oYCM-KIvgKA" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+<h1 id="improvements-to-be-made">Improvements to be made</h1>
+<ul>
+<li>Update the loader code to support our &ldquo;new floppy controller&rdquo;</li>
+<li>Diagnose our subroutine to check why it causes Z80 incompatabilities</li>
+</ul>
+]]></content>
+		</item>
+		
+		<item>
+			<title>GWEMU - Intel 8080 Emulator</title>
+			<link>/posts/gwemu_emulator/</link>
+			<pubDate>Tue, 27 Aug 2019 12:23:09 -0400</pubDate>
+			
+			<guid>/posts/gwemu_emulator/</guid>
+			<description>Why write another emulator If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.
+Introducing the GWEMU GitHub Project URL</description>
+			<content type="html"><![CDATA[<h2 id="why-write-another-emulator">Why write another emulator</h2>
+<p>If you look around for intel 8080 (which is what the system is based on) emulator on the internet today, all you will find is emulators that are tailored towards running games (namely space invadors); however, we wanted to use an emulator to 1) test our compiler 2) help debugging our assembly software when debugging using the real machine could be tricky.</p>
+<h2 id="introducing-the-gwemu">Introducing the GWEMU</h2>
+<p><a href="https://github.com/gt-retro-computing/i8080-sim">GitHub Project URL</a></p>
+<p>Writing this emulator the biggest challenge is probably figuring out how to create a decent looking GUI, as I have no exprience in C/C++ GUI programming. After seeing one of my friend drown in Qt land, I decided to try something different: GTK+ 3. This is a very popular X11 based UI framework, it should be cross-platform (Well at least on mac, I think it also works on windows but your milage may vary).</p>
+<blockquote>
+<p>Sidenote: It&rsquo;s kind of important that it runs crossplatform since our team members use all three major OS platform.</p>
+</blockquote>
+<p>GTK offered a UI deisgn suite called <code>glade</code> which greatly simplify the process of creating UI. The tool itself is pretty much drag and drop. Although it requires some tinkering to get fully working, compare to writing coding that layout the UI this is not much to complain about.</p>
+<p><img src="/image/post/gwemu/gwemu_1.png" alt="GWEMU UI"></p>
+<p>The UI ended up looking like the picture above. There&rsquo;s not much design factor went into it, just thought that have a blinking light machine is interesting so made that.</p>
+<h2 id="todo-items">TODO Items</h2>
+<ul>
+<li>Add Hexdecimal Displays for registers. (blinking light is really cool and whatnot, but I still can&rsquo;t really read binary)</li>
+<li>Disassembler for current instruction. (This might be helpful for debugging unknown program or just helps tracing)</li>
+</ul>
+]]></content>
+		</item>
+		
+		<item>
+			<title>New SIO Compatable Serial Card</title>
+			<link>/posts/new_sio_compatable_serial_card/</link>
+			<pubDate>Wed, 03 Apr 2019 22:27:06 -0400</pubDate>
+			
+			<guid>/posts/new_sio_compatable_serial_card/</guid>
+			<description>Although the system we have does include an original IMSAI SIO-2 card, which includes 2 RS-232 compatable serial interface. However, we are unable to get the card working reliably. (#TODO Link Post Here) While repairing the original IMSAI SIO-2 card is still in the long term plan, we decided to implement a custom and modern serial solution that emulates the IMSAI SIO-2 board with Intel 8051 USART communication interface IC.</description>
+			<content type="html"><![CDATA[<p>Although the system we have does include an original IMSAI SIO-2 card, 
+which includes 2 RS-232 compatable serial interface. However, we are unable
+to get the card working reliably. (#TODO Link Post Here) While repairing the 
+original IMSAI SIO-2 card is still in the long term plan, we decided to 
+implement a custom and modern serial solution that emulates the IMSAI SIO-2
+board with Intel 8051 USART communication interface IC.</p>
+<h1 id="overall-planning">Overall Planning</h1>
+<p>The overall plan is to use the USART capability of the <em>STM32F103C8T6</em> MCU to
+recieve data on the output port of the S100 Bus. However, due to the lack of 
+pins on the MCU, and the level shifting required between the RS-232 interface 
+and the TTL-UART interface of the MCU, there are quite some supporting circuitry
+required for this to function properly.</p>
+<h1 id="circuit-design">Circuit Design</h1>
+<h2 id="rs-232-to-ttl-uart-level-shifter">RS-232 to TTL UART Level Shifter</h2>
+<p>I think it would be a good idea to describe the problem first before I go on
+to talk about solution. It would be coufusing wouldn&rsquo;t it be? So in short,
+the RS-232 standard defined the logic level of the serial interface using both
+positive and negative voltages. A logical &lsquo;1&rsquo; is defined as any voltage between
+-3V and -18V, and a logical &lsquo;0&rsquo; is defined as voltage between +3V and +18V. The
+exact voltage of operation may differ depending on the reciving and sending
+device. The voltage is not as big of the problem, as through testing, we 
+discovered that most modern serial interface will happly accept ~0V as a &lsquo;1&rsquo;, and
+positive voltage as a &lsquo;0&rsquo;. However, the key problem comes in when we look at the
+specification of the TTL serial interface. Where a logical &lsquo;1&rsquo; is defined as VCC
+(Commonly 5 or 3.3V), and a logical &lsquo;0&rsquo; is defined as ~0V. An easy solution
+would be use an IC like MAX232 from Maxium Integrated. However, purchasing IC
+takes time and it&rsquo;s always better to use commonly found component from both 
+economic and maintainability perspectives.</p>
+<p>//TODO Insert Circuit Diagram of the RS-232 Level Shifter</p>
+<p>The above circuit is what we decided to use for the RS-232 level shifting. It 
+consists of one pair of NPN and PNP transistor (2N3904 and 2N3906). Essentially
+used a charge-pump to provide the negative voltage required by the RS-232 standard.</p>
+<h2 id="33v-to-ttl-logic-level-shifter">3.3V to TTL Logic Level Shifter</h2>
+<p>The IMSAI operated at TTL Logic level. Although many pins on the STM32 are 5V
+tolerant(It can acceot 5V voltage level), non of its pin can produce a high enough 
+voltage for the IMSAI to consider it a logical &lsquo;1&rsquo;. Thus we need a PNP transistor
+with 2 supporting resistor on each of the <em>DI</em>* lines to do level shifting.</p>
+<h1 id="measurement">Measurement</h1>
+<p>In order to operate on the OUTPUT port of the Intel 8080 processor, we need to 
+decode the signal on the S100 Bus. Due the failure of me last time naively trying
+to construct a output address decoder, I will make some measurements before 
+continuing.</p>
+<h2 id="output-port-signal-decoding"><strong>OUT</strong>put port signal decoding</h2>
+<p><img src="/image/post/new_sio_card/Out.png" alt="IMSAI Executing an OUT Instruction"></p>
+<p>The above image is the Intel 8080 processor executing and OUT instruction to port
+0xFF (The Lights) with data 0xFF.</p>
+<details><summary>Exact instruction listing.</summary>
+```asm
+CMA ; Complement A, as A is initialized to 0, this makes it 0xFF
+OUT 0xFF ;
+HLT ; HALT is added to assure clean signal capature. The Wait line is used for trigger
+```
+</details>
+<p>As we can see from the logic anaylizer, the address of the port is first written to 
+the S100 Bus, then sOUT signal comes HIGH, at this point the address on the bus should
+be a valid OUT PORT address. (This address is duplicated (A0-A7 = A8-A15) on the bus).
+This is when port matching could happen; however, data is not valid at this moment. 
+Output data is only valid when sOUT is HIGH <strong>AND</strong> P̅W̅R̅ is LOW.</p>
+<h2 id="input-port-signal-decoding">Input Port Signal Decoding</h2>
+<p><img src="/image/post/new_sio_card/In.png" alt="IMSAI Executing an IN Instruction"></p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>GWASM - The 8080 Assembler</title>
+			<link>/posts/assembler/</link>
+			<pubDate>Tue, 02 Apr 2019 12:23:09 -0400</pubDate>
+			
+			<guid>/posts/assembler/</guid>
+			<description>On the software side, to build an operating system, we will definitly need a compiler and an assembler. As the assembler is the simpler task of the two, we decided to start with this.
+The finished assembler can be found on our Github repository
+Lexer / Tokenizer The first part of any compiler (assembler) is to lex the source language. This is done using flex.
+Flex rules```%{ #include &amp;ldquo;helpers.</description>
+			<content type="html"><![CDATA[<p>On the software side, to build an operating system, we will definitly need a compiler and an assembler. 
+As the assembler is the simpler task of the two, we decided to start with this.</p>
+<p>The finished assembler can be found on our <a href="https://github.com/gt-retro-computing/gwasm">Github repository</a></p>
+<h1 id="lexer--tokenizer">Lexer / Tokenizer</h1>
+<p>The first part of any compiler (assembler) is to lex the source language. This is done using flex.</p>
+<details><summary>Flex rules</summary>
+```
+<p>%{
+#include &ldquo;helpers.h&rdquo;
+#include &ldquo;parser.h&rdquo;
+%}</p>
+<p>%option outfile=&ldquo;lexer.c&rdquo; header-file=&ldquo;lexer.h&rdquo;</p>
+<p>%option noyywrap</p>
+<p>COMMA &ldquo;,&rdquo;
+COLON &ldquo;:&rdquo;
+COMMENT &ldquo;;&rdquo;[^\n\r]*
+DOT &ldquo;.&rdquo;
+WHITE_SPACE [ \t]*
+LINE_BREAK [\n\r]</p>
+<p>IDENT [A-Za-z_][A-Za-z0-9_-]*</p>
+<p>HEX 0[Xx][0-9A-Fa-f]+
+OCT 0[0-7]+
+DEC [0-9]+</p>
+<p>%%</p>
+<p>{WHITE_SPACE} {}
+{LINE_BREAK} {yylineno++; return TOKEN_LINEBREAK; }
+{COMMENT} {}
+{COMMA} {return TOKEN_COMMA;}
+{COLON} {return TOKEN_COLON;}
+{DOT} {return TOKEN_DOT;}
+{DEC} { sscanf(yytext, &ldquo;%i&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{OCT} { sscanf(yytext, &ldquo;%o&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{HEX} { sscanf(yytext, &ldquo;%x&rdquo;, &amp;yylval.num); return TOKEN_NUM; }
+{IDENT} { yylval.ident = copy_str(yytext); return TOKEN_IDENT;}</p>
+<p>%%</p>
+<p>int yyerror(const char* msg)
+{ <br>
+fprintf(stderr,&ldquo;Error text = %s | Line: %d\n%s\n&rdquo;,yytext, yylineno, msg);
+return 0;
+}</p>
+<pre tabindex="0"><code>&lt;/details&gt;
+
+# Parsing
+After the flex parsed the input, we can use the generated tokens to parse the assembly. The strucutre is essentially made of three types of element in the abstract syntax (Tree): ```instruction```, ```label```, and ```directive```
+## First Pass
+the goal of the first pass is to generate the symbol table, as well as identify every instruction (Also detecting illegal instructions) as well as its respective arguments. However, due to the fact we are creating symbol table in this pass, thus we can not detect references to invalid labels (yet).
+Below is a sample program [fib.s](/posts/first_program/).
+&lt;details&gt;&lt;summary&gt;Output After First Pass 1&lt;/summary&gt;
+</code></pre><p>(D[1]): .org (ADDR 0x0) 
+(L) [0x0] init
+(I[0]): sphl 
+(I[2]): mvi (REG a)(IMM 0) 
+(I[2]): mvi (REG b)(IMM 1) 
+(I[2]): mvi (REG l)(IMM 255) 
+(L) [0x7] fib
+(I[2]): mov (REG c)(REG a)
+(I[1]): add (REG b)
+(I[1]): jc (ADDR [init]) 
+(I[1]): xra (REG l)
+(I[1]): out (ADDR 0xFF) 
+(I[1]): xra (REG l)
+(I[2]): mov (REG b)(REG c)
+(I[2]): mov (REG h)(REG a)
+(I[2]): lxi (REGP bc)(IMM 65535) 
+(L) [0x15] delay
+(I[1]): dcx (REGP bc)
+(I[2]): mov (REG a)(REG d)
+(I[1]): ora (REG e)
+(I[1]): jnz (ADDR [delay]) 
+(I[2]): mov (REG a)(REG h)
+(I[1]): jmp (ADDR [fib])</p>
+<pre tabindex="0"><code> This is part of the assembler&#39;s debug output. Format reads as follow: (Type: D:Directive, I:Instruction, L:Label. [Number of Arguments Associated With This Node]): [Resolved Label Address]
+&lt;/details&gt;
+
+
+## Pass 2: Address Subsistution 
+
+As you can see from the output of 1st pass, it still looks very much like the original assembly input. This is very close to the final output, as an assembler is a very simple compiler. It is really close
+to the final output of the progarm, the missing step is to backfill the label reference and translate the mnemonic into binary instruction.
+
+&lt;details&gt;&lt;summary&gt;Output from stage 2&lt;/summary&gt;
+</code></pre><p>(D[1]): .org (ADDR 0x0) 
+(L) [0x0] init
+(I[0]): sphl 
+(I[2]): mvi (REG a)(IMM 0) 
+(I[2]): mvi (REG b)(IMM 1) 
+(I[2]): mvi (REG l)(IMM 255) 
+(L) [0x7] fib
+(I[2]): mov (REG c)(REG a)
+(I[1]): add (REG b)
+(I[1]): jc (ADDR 0x0) 
+(I[1]): xra (REG l)
+(I[1]): out (ADDR 0xFF) 
+(I[1]): xra (REG l)
+(I[2]): mov (REG b)(REG c)
+(I[2]): mov (REG h)(REG a)
+(I[2]): lxi (REGP bc)(IMM 65535) 
+(L) [0x15] delay
+(I[1]): dcx (REGP bc)
+(I[2]): mov (REG a)(REG d)
+(I[1]): ora (REG e)
+(I[1]): jnz (ADDR 0x15) 
+(I[2]): mov (REG a)(REG h)
+(I[1]): jmp (ADDR 0x7)</p>
+<pre tabindex="0"><code>&lt;/details&gt;
+</code></pre>]]></content>
+		</item>
+		
+		<item>
+			<title>IMSAI SIO Card Debugging</title>
+			<link>/posts/imsai_sio_debugging/</link>
+			<pubDate>Tue, 12 Mar 2019 13:21:53 -0400</pubDate>
+			
+			<guid>/posts/imsai_sio_debugging/</guid>
+			<description>Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual.</description>
+			<content type="html"><![CDATA[<h1 id="status-finding-issue">Status: Finding Issue</h1>
+<p>As listed in the system summary, we have an original IMSAI SIO-2 card. Which
+contains 2 USART serial interfaces. This is post will document the process and
+steps we took to debug and repair the card. Simply following the directions from
+the manual did not give us the expected result, thus this post will be quite 
+long.</p>
+<h1 id="troubleshooting">Troubleshooting</h1>
+<h2 id="naive-attempt-at-the-example-give-from-the-original-imsai-manual">Naive attempt at the example give from the original IMSAI Manual.</h2>
+<pre tabindex="0"><code>; jsio.asm jha 8/2/2018 testing sio
+; https://wiki.theretrowagon.com/wiki/Imsai_8080
+; Originally from a Monitor program code by John Garza hence the EQUates
+; http://jgarza.sdf.org/files/M72.ASM
+;
+; Important init code from VCF forums
+; handy VCF threads for configuration
+; http://www.vcfed.org/forum/showthread.php?64964-Imsai-FIF-FDC-project
+; http://www.vcfed.org/forum/showthread.php?37137-How-to-get-output-from-SIO-with-Intel-8251A-USART
+;
+; uses a straight through cable.
+
+;------------------
+;IMSAI 8080 EQUATES
+
+LEDS	equ	0FFh	;IMSAI front panel output LEDs (top left)
+SWCH	equ	0FFh	;IMSAI front panel input switches (left)
+
+; channel a
+TTS     equ     03h     ;SIO channel A command port
+TTI     equ     02h     ;SIO channel A data port (yes input=output)
+TTO     equ     02h     ;SIO channel A data port
+
+; channel b
+;TTS     equ     05h     ;SIO channel B command port
+;TTI     equ     04h     ;SIO channel B data port (yes input=output)
+;TTO     equ     04h     ;SIO channel B data port
+
+TTYDA   equ     02h     ;tty data available (ready to receive?)
+TTYTR   equ     01h     ;tty terminal ready (ready to transmit?)
+
+    org 0000h
+init:
+    mvi a,0
+    out TTS
+    out TTS
+    out TTS
+    mvi a,040h
+    out TTS
+    mvi a,04eh  ; 8,1,n
+    out TTS
+    mvi a,037h
+    out TTS
+
+inout:               ; loop read from serial, write it to serial. Serial terminal echo.
+    in TTS
+    ani TTYDA        ; DATA available?
+    jz inout
+io1:
+    in TTS
+ani TTYTR           ; ready to receive?
+    jz io1
+    in TTO          ; read character
+    out TTO         ; write
+    jmp inout       ; repeat
+    end
+</code></pre>]]></content>
+		</item>
+		
+		<item>
+			<title>The MMU - Part 1: Design and measure</title>
+			<link>/posts/mmu_design/</link>
+			<pubDate>Fri, 01 Mar 2019 12:08:13 -0500</pubDate>
+			
+			<guid>/posts/mmu_design/</guid>
+			<description>Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &amp;ldquo;virtual address spaces&amp;rdquo;. This is great solution for multiple programs competing for the same blocks of memory.</description>
+			<content type="html"><![CDATA[<h1 id="creating-an-memory-management-unit-for-the-8080-cpu">Creating an Memory Management Unit for the 8080 CPU</h1>
+<h2 id="background-and-theory">Background and Theory</h2>
+<p>As part of the project goal is to get this IMSAI to run a modern operating system with 
+preemptive multitasking capabilities. A crucial component that is currently missing is the 
+<a href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory Management Unit</a><sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. Having 
+the memory management uint allows programs to be allocated &ldquo;virtual address spaces&rdquo;. 
+This is great solution for multiple programs competing for the same blocks of memory. 
+In modern processors, the MMU is built as part of the CPU&rsquo;s architecture, so there are 
+instructions that support memory mapping operation as well as a mapping from the 
+memory map table. However, looking at the 8080, there is apparently no support for this at all.
+Therefore a solution to this problem is to &ldquo;expand&rdquo; the instruction set by using the <code>OUT</code> 
+instruction with specific address as a &rsquo;trap&rsquo; to address external hardware do the memory mapping.</p>
+<h2 id="implementation">Implementation</h2>
+<p>To implement this memory management scheme, we need to bridge the real memory and the CPU address 
+space with the MMU. Unfortunately, to achieve this we will be breaking the comparability with any 
+of the original memory cards. To the CPU, the only memory it sees is going to be our MMU card<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<p>The MMU will divide the entire address space (64K) of the CPU into 16 4K sized pages. 
+Each page can be independently mapped into any 4K boundary in the real 1M address space.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
+<p>To accomplish this mapping feature, the MMU has two on-board register file that contains 16 x 8bit 
+and 16 x4 bit registers. The 8 bit register file contains mapping to the physical address space. 
+The 4 bit register file contains read/write protection bits when operate in protection ring<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> 1.</p>
+<h3 id="known-limitations">Known limitations</h3>
+<h3 id="measurement-of-the-bus-status-during-different-instruction-cycles">Measurement of the BUS status during different instruction cycles</h3>
+<p><img src="/image/post/mmu_design/scope_6.png" alt="Screenshot 1"></p>
+<center>Scope Screenshot of the TODO cycle</center>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>Wikipedia: Memory Management Unit&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>It&rsquo;s not entirely true, as described in the memory map section.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Due to some technical difficulties with our specific implementation and the nature of the operating system the lowest 4K block can not be realistically remapped. Thus later we decided to remove the mapping capability of the lowest 4K page.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p><a href="https://en.wikipedia.org/wiki/Memory_protection">Memory protection</a> and execution <a href="https://en.wikipedia.org/wiki/Protection_ring">protection ring</a>.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Memory Dumper</title>
+			<link>/posts/memory_dumper/</link>
+			<pubDate>Fri, 08 Feb 2019 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/memory_dumper/</guid>
+			<description>Background So we have got our first program running on the old IMSAI 8080 computer. Although the process of flipping switches to program the machine in binary was an extraordinary experience for the first few days, but very soon it got very tedious and slowing us down in the process of debugging the system.
+With all the modern technology we have got, we decided to make some quick hardware that allows us to directly write the memory without manually entering each byte.</description>
+			<content type="html"><![CDATA[<h1 id="background">Background</h1>
+<p>So we have got our first program running on the old IMSAI 8080 computer. 
+Although the process of flipping switches to program the machine in <em>binary</em>
+was an extraordinary experience for the first few days, but very soon it got
+very tedious and slowing us down in the process of debugging the system.</p>
+<p>With all the modern technology we have got, we decided to make some quick 
+hardware that allows us to directly write the memory without manually entering
+each byte.</p>
+<h1 id="overall-design">Overall Design</h1>
+<p>The core of this card is a STM32F103C8T6 ARM microcontroller. Ironically it is
+many many times more powerful than the CPU of the system (Intel 8080). However,
+due to the number of IOs that are availiable on the MCU, we are unable to map
+all the necessary pins from the S100 bus directly to the MCU. Thus we had to 
+use shiftregisters for both input and output data. The shfit registers that we
+selected are 74HC595 (Serial to Parallel (Used for Output)) and 74HC165
+(Parallel or Serial to Serial (Used for Input)).</p>
+<h1 id="schematics">Schematics</h1>
+<p>The <a href="https://github.com/gt-retro-computing/S100-Memory-Dumper-PCB">PCB Design Files</a>
+are located on Github under S100MemoryDumper-PCB. The board is designed with
+Altium Designer 19. To provide easier and broder access, the exported Gerber
+files are located under the releases tab.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Front Panel Broke Down: A Dead 74LS10</title>
+			<link>/posts/frontpanel_broke_down/</link>
+			<pubDate>Tue, 05 Feb 2019 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/frontpanel_broke_down/</guid>
+			<description>Front panel repair During the process of testing the memory dumper card, we found some how the front panel is behaving weirdly.
+Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10 (Dual Tri-input NAND gates). Which controls the input switches.</description>
+			<content type="html"><![CDATA[<h1 id="front-panel-repair">Front panel repair</h1>
+<p>During the process of testing the <a href="/posts/memory_dumper">memory dumper card</a>, we found some how the 
+front panel is behaving weirdly.</p>
+<p>Took quite a while for us to track down the problem, but eventually it narrowed down to a broken 74LS10
+(Dual Tri-input NAND gates). Which controls the input switches.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Fibonacci! - First program!</title>
+			<link>/posts/first_program/</link>
+			<pubDate>Sat, 02 Feb 2019 12:08:13 -0500</pubDate>
+			
+			<guid>/posts/first_program/</guid>
+			<description>Computing the Fibonacci Series We have got the computer operational again. As of right now, everything essential is working again. The IMSAI 8080 come with a input and output both addressed on port 0xFF which maps to the higher 8 bits of address and the 8 led on the top left corner of the front panel.
+The first program we decided to run on the machine is to compute the fibonacci series and display them one at a time on the front panel led.</description>
+			<content type="html"><![CDATA[<h1 id="computing-the-fibonacci-series">Computing the Fibonacci Series</h1>
+<p>We have got the computer operational again. As of right now, everything 
+essential is working again. The IMSAI 8080 come with a input and output 
+both addressed on port <code>0xFF</code> which maps to the higher 8 bits of 
+address and the 8 led on the top left corner of the front panel.</p>
+<p>The first program we decided to run on the machine is to compute the fibonacci
+series and display them one at a time on the front panel led.</p>
+<p>Below is the listing and video of it running</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">;fib
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="na">.org</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">init:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">b</span><span class="p">,</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">l</span><span class="p">,</span> <span class="mi">0xFF</span>
+</span></span><span class="line"><span class="cl"><span class="nl">fib:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mov</span> <span class="no">c</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">add</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jc</span> <span class="no">init</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">xra</span> <span class="no">l</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="mi">0xff</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">xra</span> <span class="no">l</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mov</span> <span class="no">b</span><span class="p">,</span> <span class="no">c</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mov</span> <span class="no">h</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">LXI</span> <span class="no">d</span><span class="p">,</span> <span class="mi">0</span><span class="no">FFFFh</span>
+</span></span><span class="line"><span class="cl"><span class="nl">delay:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">dcx</span> <span class="no">d</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mov</span> <span class="no">a</span><span class="p">,</span> <span class="no">d</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ora</span> <span class="no">e</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jnz</span> <span class="no">delay</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mov</span> <span class="no">a</span><span class="p">,</span> <span class="no">h</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jmp</span> <span class="no">fib</span>
+</span></span></code></pre></div><h1 id="videos">Videos</h1>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/9FKPAX2WN8E" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+<center>The above code executed</center>
+<h1 id="original-single-stepped-version">Original Single Stepped version.</h1>
+<p>This is the first <em>actual</em> first program we got working on this machine. There&rsquo;s lots of patching 
+thus includes a lot of  <code>NOP</code> and <code>JMP</code> instructions.</p>
+<center><iframe width="560" height="315" src="https://www.youtube.com/embed/Uavji8Hw_UQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center> ]]></content>
+		</item>
+		
+		<item>
+			<title>Power Up!</title>
+			<link>/posts/powerup/</link>
+			<pubDate>Fri, 01 Feb 2019 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/powerup/</guid>
+			<description>The IMSAI 8080  TLDR; this post documents the IMSAI system as we got it.
+ Through the VIP program at Georgia Tech, we were able to acquire an IMSAI 8080 system to work on. Initially I had little to no knowledge about the IMSAI system. Through some quick web search we were able to find the manual for the computer and understand some history behind it.
+History The IMSAI 8080 is one of the first desktop computer at the time.</description>
+			<content type="html"><![CDATA[<h1 id="the-imsai-8080">The IMSAI 8080</h1>
+<blockquote>
+<p>TLDR; this post documents the IMSAI system as we got it.</p>
+</blockquote>
+<p>Through the VIP program at Georgia Tech, 
+we were able to acquire an IMSAI 8080 system to work on.
+Initially I had little to no knowledge about the IMSAI system. 
+Through some quick web search we were able to find the manual for the computer 
+and understand some history behind it.</p>
+<h2 id="history">History</h2>
+<p>The IMSAI 8080 is one of the first desktop computer at the time. 
+(following the Altair 8800) It&rsquo;s also one of the machine that shaped the S-100 Bus
+standard which ruled the personal computing market for quite a while back in the 1970s.</p>
+<p>The IMSAI 8080 come standard with a MPU (MPU-A) board equipped with an Intel™ 8080 CPU and 
+IMSAI MPU front panel.</p>
+<h1 id="our-system">Our System</h1>
+<p>These are the boards that we got along with the machine</p>
+<h2 id="imsai-mpu-a">IMSAI MPU-A</h2>
+<p>This is the original CPU board that shipped with the system. It contains the Intel™ 8080
+CPU and some supporting circuitry. The board looks complicated, as the Intel™ 8080 requires
+rather complicated support circuitry including a special 2 phase clock generator 
+and 3 rail power supply (±5V and 12V).</p>
+<p>As shown in the picture, the white and gold ceramic packaged chip is the Intel™ 8080 CPU.
+This particular one is made in Malaysia 1977.
+On the top right there is an empty socket, which is the for the front panel (CPA) and CPU private 
+bus to connect to. Although it looks like a 16 pin socket, in reality the two pins are shorted in 
+every column. It only carries an 8-bit signal (data bus) between the front panel and the CPU board.</p>
+<p><a href="/image/post/powerup/MPU-A.jpeg" target="_blank"><img src="/image/post/powerup/thumb/MPU-A.jpeg" alt="IMSAI MPU-A"></a></p>
+<center>*The IMSAI MPU* (click for a larger image)</center>]]></content>
+		</item>
+		
+	</channel>
+</rss>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta itemprop="name" content="LLVM For Dummies: (1)Intro &amp; Assembler">
+<meta itemprop="description" content="What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)"><meta itemprop="datePublished" content="2020-10-06T00:00:00-04:00" />
+<meta itemprop="dateModified" content="2020-10-06T00:00:00-04:00" />
+<meta itemprop="wordCount" content="517">
+<meta itemprop="keywords" content="Software,LLVM,Compiler," /><meta property="og:title" content="LLVM For Dummies: (1)Intro &amp; Assembler" />
+<meta property="og:description" content="What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/llvm_assembler/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-10-06T00:00:00-04:00" />
+<meta property="article:modified_time" content="2020-10-06T00:00:00-04:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="LLVM For Dummies: (1)Intro &amp; Assembler"/>
+<meta name="twitter:description" content="What is LLVM and why?  The LLVM compiler infrastructure project is a set of compiler and toolchain technologies,[4] which can be used to develop a front end for any programming language and a back end for any instruction set architecture. LLVM is designed around a language-independent intermediate representation that serves as a portable, high-level assembly language that can be optimized with a variety of transformations over multiple passes. (Wikipedia)"/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>LLVM For Dummies: (1)Intro &amp; Assembler</title>
+	
+	<link rel="stylesheet" href="/css/style.min.c693329ce3bac2503f88115a4011a284a06d53e30f484562a37664dc4c5f0a74.css" integrity="sha256-xpMynOO6wlA/iBFaQBGihKBtU+MPSEVio3Zk3ExfCnQ=">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">The IMSAI Gang</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="/posts/">Posts</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/gt-retro-computing" target="_blank" rel="noopener" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Oct 6, 2020</span></div>
+				<h1>LLVM For Dummies: (1)Intro &amp; Assembler</h1>
+			</header>
+			<div class="content">
+				<h1 id="what-is-llvm-and-why">What is LLVM and why?<a href="#what-is-llvm-and-why" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<blockquote>
+<p>The <strong>LLVM</strong> <a href="https://en.wikipedia.org/wiki/Compiler">compiler</a> infrastructure project is a set of compiler and <a href="https://en.wikipedia.org/wiki/Toolchain">toolchain</a> technologies,[<a href="https://en.wikipedia.org/wiki/LLVM#cite_note-4">4]</a> which can be used to develop a <a href="https://en.wikipedia.org/wiki/Compiler#Front_end">front end</a> for any <a href="https://en.wikipedia.org/wiki/Programming_language">programming language</a> and a <a href="https://en.wikipedia.org/wiki/Compiler#Back_end">back end</a> for any <a href="https://en.wikipedia.org/wiki/Instruction_set_architecture">instruction set architecture</a>. LLVM is designed around a <a href="https://en.wikipedia.org/wiki/Language-independent_specification">language-independent</a> <a href="https://en.wikipedia.org/wiki/Intermediate_representation">intermediate representation</a> that serves as a <a href="https://en.wikipedia.org/wiki/Software_portability">portable</a>, high-level <a href="https://en.wikipedia.org/wiki/Assembly_language">assembly language</a> that can be <a href="https://en.wikipedia.org/wiki/Optimizing_compiler">optimized</a> with a variety of transformations over multiple passes. (Wikipedia)</p>
+</blockquote>
+<p>So they why actually comes from the goal of this bigger restoration project which includes writing a modern multi-tasking operating system for the Intel 8080 microprocessor. Due to the limited amount of memory and releativly low speed, we would like our OS code to be compiled as efficient as possible. In order to achieve efficient complication, we decied to port a existing compiler to the Intel 8080. LLVM is just the right portable framework for such a compiler.</p>
+<h1 id="but-how">But How?<a href="#but-how" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<p>if you just go out and checkout (or download) the LLVM source tree from GitHub right now, you will soon realize that it is a massive project, and there are not much documentation to help you get started on porting it into a new platfom (Target).</p>
+<p><a href="https://github.com/llvm/llvm-project">LLVM master branch GitHub mirror repository</a></p>
+<p>So through this series of posts we will try out best to describe the process of porting LLVM to a new architecture, as well as the &ldquo;hoops&rdquo; we had to jump through in order to make progress. This is meant to be for beginners, as we started with just about zero knowledge on LLVM.</p>
+<h1 id="llvm-whats-special-about-it">LLVM? What&rsquo;s special about it?<a href="#llvm-whats-special-about-it" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<p>Before we jump into building a backend for LLVM that targets an architechture we want, I want to describe on a very high level how does LLVM turn your high level programming language into machine code</p>
+<p>The concept of LLVM is that instead of building multiple compilers for each language and target, we can seperate the langauge sepecific part (Front end) and the machine specific part (Backend). With this approach, we can change the process of building compilers O(n^2) to O(2n).</p>
+<h1 id="building-a-backend">Building a backend<a href="#building-a-backend" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<p>In this series we will slowly cover how to use the LLVM Compiler Infrastrucutre. We will start by building a new backend that targets the famouz Zilog Z80 processor.</p>
+<p>In order to make our backend easy to test, we will start by building a assembler. Strictly saying this is not nessrary unless you are planing on either using the LLVM assembler (llvm-mc) or supporting inline assembly, but I found that starting from a assembler is usually the best place to start a new backend. Since by creating the assembler you will have the opportiunity to describe all the instructions that the architecture support without having to worry about instruction selection.</p>
+<p>Also note that this will be a big theme throughout this series,  where we will try to keep the project in a &ldquo;building&rdquo; state, which means you can build and test your progress along the way. I personally find being able to see incremental progress very important to 1) find error early on and 2) motivate me to keep continue working on it.</p>
+
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>Author: Codetector</p>
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/software">Software</a></span><span class="tag"><a href="/tags/llvm">LLVM</a></span><span class="tag"><a href="/tags/compiler">Compiler</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>517 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-10-06</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/build_llvm/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>LLVM Z80: Building</span>
+			</a>
+			<a class="prev-post" href="/posts/tarbell_md1101/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Tarbell MD1101 SSSD Floppy Controller</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2022 <a href="/">the IMSAI Gang</a></p>
+		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="/js/main.min.17d74807d860815985fea50c0164a0c132f23813ff704cf899739c92249d91e1.js" integrity="sha256-F9dIB9hggVmF/qUMAWSgwTLyOBP/cEz4mXOckiSdkeE="></script>
+
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Debugging on The IMSAI Gang</title>
+    <link>/tags/debugging/</link>
+    <description>Recent content in Debugging on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 Apr 2022 03:00:00 -0400</lastBuildDate><atom:link href="/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debugging the Cremenco TU-ART Card</title>
+      <link>/posts/cremenco_tuart_debugging/</link>
+      <pubDate>Tue, 26 Apr 2022 03:00:00 -0400</pubDate>
+      
+      <guid>/posts/cremenco_tuart_debugging/</guid>
+      <description>This is the first [and potentially the last :( ] time I am writing for this blog. I&amp;rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa.</description>
+    </item>
+    
+  </channel>
+</rss>

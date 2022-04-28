@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MMU on The IMSAI Gang</title>
+    <link>/tags/mmu/</link>
+    <description>Recent content in MMU on The IMSAI Gang</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 01 Mar 2019 12:08:13 -0500</lastBuildDate><atom:link href="/tags/mmu/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The MMU - Part 1: Design and measure</title>
+      <link>/posts/mmu_design/</link>
+      <pubDate>Fri, 01 Mar 2019 12:08:13 -0500</pubDate>
+      
+      <guid>/posts/mmu_design/</guid>
+      <description>Creating an Memory Management Unit for the 8080 CPU Background and Theory As part of the project goal is to get this IMSAI to run a modern operating system with preemptive multitasking capabilities. A crucial component that is currently missing is the Memory Management Unit1. Having the memory management uint allows programs to be allocated &amp;ldquo;virtual address spaces&amp;rdquo;. This is great solution for multiple programs competing for the same blocks of memory.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta itemprop="name" content="IMSAI SIO Card Debugging">
+<meta itemprop="description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual."><meta itemprop="datePublished" content="2019-03-12T13:21:53-04:00" />
+<meta itemprop="dateModified" content="2019-03-12T13:21:53-04:00" />
+<meta itemprop="wordCount" content="291">
+<meta itemprop="keywords" content="" /><meta property="og:title" content="IMSAI SIO Card Debugging" />
+<meta property="og:description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/imsai_sio_debugging/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-03-12T13:21:53-04:00" />
+<meta property="article:modified_time" content="2019-03-12T13:21:53-04:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="IMSAI SIO Card Debugging"/>
+<meta name="twitter:description" content="Status: Finding Issue As listed in the system summary, we have an original IMSAI SIO-2 card. Which contains 2 USART serial interfaces. This is post will document the process and steps we took to debug and repair the card. Simply following the directions from the manual did not give us the expected result, thus this post will be quite long.
+Troubleshooting Naive attempt at the example give from the original IMSAI Manual."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>IMSAI SIO Card Debugging</title>
+	
+	<link rel="stylesheet" href="/css/style.min.c693329ce3bac2503f88115a4011a284a06d53e30f484562a37664dc4c5f0a74.css" integrity="sha256-xpMynOO6wlA/iBFaQBGihKBtU+MPSEVio3Zk3ExfCnQ=">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">The IMSAI Gang</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="/posts/">Posts</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/gt-retro-computing" target="_blank" rel="noopener" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Mar 12, 2019</span></div>
+				<h1>IMSAI SIO Card Debugging</h1>
+			</header>
+			<div class="content">
+				<h1 id="status-finding-issue">Status: Finding Issue<a href="#status-finding-issue" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<p>As listed in the system summary, we have an original IMSAI SIO-2 card. Which
+contains 2 USART serial interfaces. This is post will document the process and
+steps we took to debug and repair the card. Simply following the directions from
+the manual did not give us the expected result, thus this post will be quite 
+long.</p>
+<h1 id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h1>
+<h2 id="naive-attempt-at-the-example-give-from-the-original-imsai-manual">Naive attempt at the example give from the original IMSAI Manual.<a href="#naive-attempt-at-the-example-give-from-the-original-imsai-manual" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<pre tabindex="0"><code>; jsio.asm jha 8/2/2018 testing sio
+; https://wiki.theretrowagon.com/wiki/Imsai_8080
+; Originally from a Monitor program code by John Garza hence the EQUates
+; http://jgarza.sdf.org/files/M72.ASM
+;
+; Important init code from VCF forums
+; handy VCF threads for configuration
+; http://www.vcfed.org/forum/showthread.php?64964-Imsai-FIF-FDC-project
+; http://www.vcfed.org/forum/showthread.php?37137-How-to-get-output-from-SIO-with-Intel-8251A-USART
+;
+; uses a straight through cable.
+
+;------------------
+;IMSAI 8080 EQUATES
+
+LEDS	equ	0FFh	;IMSAI front panel output LEDs (top left)
+SWCH	equ	0FFh	;IMSAI front panel input switches (left)
+
+; channel a
+TTS     equ     03h     ;SIO channel A command port
+TTI     equ     02h     ;SIO channel A data port (yes input=output)
+TTO     equ     02h     ;SIO channel A data port
+
+; channel b
+;TTS     equ     05h     ;SIO channel B command port
+;TTI     equ     04h     ;SIO channel B data port (yes input=output)
+;TTO     equ     04h     ;SIO channel B data port
+
+TTYDA   equ     02h     ;tty data available (ready to receive?)
+TTYTR   equ     01h     ;tty terminal ready (ready to transmit?)
+
+    org 0000h
+init:
+    mvi a,0
+    out TTS
+    out TTS
+    out TTS
+    mvi a,040h
+    out TTS
+    mvi a,04eh  ; 8,1,n
+    out TTS
+    mvi a,037h
+    out TTS
+
+inout:               ; loop read from serial, write it to serial. Serial terminal echo.
+    in TTS
+    ani TTYDA        ; DATA available?
+    jz inout
+io1:
+    in TTS
+ani TTYTR           ; ready to receive?
+    jz io1
+    in TTO          ; read character
+    out TTO         ; write
+    jmp inout       ; repeat
+    end
+</code></pre>
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>Author: </p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>291 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-03-12</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/assembler/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>GWASM - The 8080 Assembler</span>
+			</a>
+			<a class="prev-post" href="/posts/mmu_design/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>The MMU - Part 1: Design and measure</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2022 <a href="/">the IMSAI Gang</a></p>
+		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="/js/main.min.17d74807d860815985fea50c0164a0c132f23813ff704cf899739c92249d91e1.js" integrity="sha256-F9dIB9hggVmF/qUMAWSgwTLyOBP/cEz4mXOckiSdkeE="></script>
+
+</body>
+
+</html>

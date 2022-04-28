@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta itemprop="name" content="Debugging the Cremenco TU-ART Card">
+<meta itemprop="description" content="This is the first [and potentially the last :( ] time I am writing for this blog. I&rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa."><meta itemprop="datePublished" content="2022-04-26T03:00:00-04:00" />
+<meta itemprop="dateModified" content="2022-04-26T03:00:00-04:00" />
+<meta itemprop="wordCount" content="1849">
+<meta itemprop="keywords" content="SerialCard,UART,Hardware,NewCard,IMSAI SIO,S100 SIO,FPGA,Debugging," /><meta property="og:title" content="Debugging the Cremenco TU-ART Card" />
+<meta property="og:description" content="This is the first [and potentially the last :( ] time I am writing for this blog. I&rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/cremenco_tuart_debugging/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-26T03:00:00-04:00" />
+<meta property="article:modified_time" content="2022-04-26T03:00:00-04:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Debugging the Cremenco TU-ART Card"/>
+<meta name="twitter:description" content="This is the first [and potentially the last :( ] time I am writing for this blog. I&rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.
+Background Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Debugging the Cremenco TU-ART Card</title>
+	
+	<link rel="stylesheet" href="/css/style.min.c693329ce3bac2503f88115a4011a284a06d53e30f484562a37664dc4c5f0a74.css" integrity="sha256-xpMynOO6wlA/iBFaQBGihKBtU+MPSEVio3Zk3ExfCnQ=">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">The IMSAI Gang</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					<a href="/posts/">Posts</a>
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://github.com/gt-retro-computing" target="_blank" rel="noopener" title="Github"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Apr 26, 2022</span></div>
+				<h1>Debugging the Cremenco TU-ART Card</h1>
+			</header>
+			<div class="content">
+				<p>This is the first [and potentially the last :( ] time I am writing for this blog. I&rsquo;ve been working at the VIP for 2 semesters, and my work primarily focused on getting the IMSAI 8080 to work. Here I document my work with the Cremenco TU-ART card, and how Calvin and I tried to get it to work with a PuTTY terminal.</p>
+<h2 id="background">Background<a href="#background" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>Work done previously by Calvin had led to the discovery of the FTDI interface, a way to convert USB communication to Serial communication (TTL level) and vice versa.</p>
+<p>This greatly simplifies things for us, since we now have a way to plug in the Cremenco card straight into our laptop and using PuTTY, display the Serial output that CP/M will eventually display its output to and take keyboard input from.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/ftdi_pinout.png" alt="FTDI Pinout"></p>
+<h3 id="breakdown-of-cremenco-tu-art-card">Breakdown of Cremenco TU-ART Card<a href="#breakdown-of-cremenco-tu-art-card" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<ul>
+<li>2 Parallel IO and 2 Serial IO ports. Serial IO are RS232C compatible</li>
+<li>Interrupt Capabilities: On board Priority Encoding, interrupt generation, interrupt acknowledgement, and daisy chaining expandability</li>
+</ul>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_board.png" alt="Cremenco TU-ART Board"></p>
+<p>Note the wires coming out of the board’s IC Sockets, and not out of the Jumper Header. FTDI works at 5V TTL levels, and these are the levels before it goes into the ICs [which are basically buffers] before being stepped up to 12V levels of the RS 232C standard. We removedd the ICs that were converting the TTL to RS232, and connected the right pins to our FTDI cable.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_ic_removed.png" alt="TU-ART IC Removed"></p>
+<h2 id="previous-iteration-of-ftdi-connection--mistakes">Previous Iteration of FTDI Connection (+ mistakes)<a href="#previous-iteration-of-ftdi-connection--mistakes" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<h3 id="connection-1">Connection 1:<a href="#connection-1" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Connection was made to Rx and Tx only. Rx of IMSAI was connected to Tx of FTDI. Tx of IMSAI was connected to Rx of FTDI.</p>
+<p><em>Feedback:</em></p>
+<p>This Connection was a mistake because</p>
+<ol>
+<li>
+<p>No GND connection was made.</p>
+</li>
+<li>
+<p>Rx and Tx were inverted. While a regular UART connection does require this inversion, the FTDI did this internally for us.</p>
+</li>
+</ol>
+<h3 id="connection-2">Connection 2:<a href="#connection-2" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Connection was made to Rx and Tx and GND. Rx of IMSAI was connected to Tx of FTDI. Tx of IMSAI was connected to Tx of FTDI.</p>
+<p><em>Feedback:</em></p>
+<ol>
+<li>This is the connection being used currently. While the connection does not work the way we expect it to, we are working on debugging this one.</li>
+</ol>
+<p><img src="/image/post/cremenco_tuart_debugging/ftdi_final_connection.png" alt="FTDI Final Connection"></p>
+<h3 id="change-in-connection-output">Change in connection output<a href="#change-in-connection-output" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>The first issue noticed on Connection 1 was that there were visible signals rather than noise on the Oscilloscope output.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/connection1_oscilloscope_noise.png" alt="Connection 1 Oscilloscope Noise"></p>
+<p>There was a 60 Hz Disturbance on both lines, which eventually turned out to be caused by the transformer over which the wire was running. Since all 3 wires were near the transformer, the disturbance would affect all 3 relatively the same way, and therefore would cancel out since the ground picked up the same noise all the other wires were picking up.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/connection2_inconsistent_voltage.png" alt="Connection 2 Inconsistent Voltage"></p>
+<p>However, one thing that was noticed was that the oscilloscope was interfering with the Serial communication between the 2 devices, and so had to be removed to continue.</p>
+<p>There were inconsistencies with the voltage levels (typically, they are driven to 5V, but here they seemed to be driven to just 230 mV, which I felt was the next issue we should look at debugging).</p>
+<h2 id="driver-code-for-the-tu-art">Driver Code for the TU-ART<a href="#driver-code-for-the-tu-art" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>The reason why the TTL logic signals were not correct was because the card had not been reset after the IMSAI boots up, and hence it was not driving any signal on the output wires. We pulled up some of the example code from the TU-ART documentation and began using that as a reference to write some driver code to reset the TU-ART and try and write bytes to a PuTTY shell on our laptop.</p>
+<h3 id="driver-code-iteration-1---simple-write">Driver Code Iteration 1 - Simple Write<a href="#driver-code-iteration-1---simple-write" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Using <em><strong>Appendix A</strong></em> as a starting point, an attempt was made to transmit data to a PuTTY terminal. The terminal did not receive any data, and ghost bytes [0x00 or null] were logged by PuTTY on every program reset while the program was running. This was not the desired output.</p>
+<p>The program pointed out an issue: The device had its TBE bit set to 0 when the status register was read. This meant that the device was not ready to read, even though we had just reset it, which would case that bit to be set high.</p>
+<p>The Program was modified by me to the one in Appendix B. This program was then run. Upon user intervention, it was noticed that:</p>
+<ol>
+<li>
+<p>TBE is still not set – the device is still not ready to transfer data!</p>
+</li>
+<li>
+<p>RDA is set – The device wants us to read data instead!</p>
+</li>
+</ol>
+<p><img src="/image/post/cremenco_tuart_debugging/tuart_status_bits.png" alt="TUART Status Bits">
+<img src="/image/post/cremenco_tuart_debugging/imsai_rda_output.png" alt="IMSAI RDA Output"></p>
+<p>Note that the Front Panel Display byte (updated through a <code>OUT 0xFF</code>) shows the bits inverted. This was because it was easier to have those LEDs pulled down when HIGH. However this is only applicable for the <code>OUT 0xFF</code> LED display. All other LED displays on the front panel [the data and address buses] show the bits as they are.</p>
+<h3 id="driver-code-iteration-2---greedy-read">Driver Code Iteration 2 - Greedy Read<a href="#driver-code-iteration-2---greedy-read" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>We handled this by letting the user intervene, allow the program to read some data, and then continue.
+Code in <strong>Appendix B</strong> shows the modified assembly.</p>
+<p>On my first try after this intervention was added, the device read the initial byte, and then the TBE bit was set to 1! This showed the data we were outputting on the IMSAI front panel, 0x88. However, there was still no transmission seen on the PuTTY terminal.
+Unfortunately, this was not reproducible. This happened only 3 times after, before it just stopped setting TBE status bit high. There was no change made to hardware, we were just uploading software to the device and restarting.</p>
+<h3 id="driver-code-iteration-3---rda-debugger">Driver Code Iteration 3 - RDA Debugger<a href="#driver-code-iteration-3---rda-debugger" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<p>Finally, I decided to try and see what the data the TU-ART was asking us to read. Was the card trying to give us some initial data? Was there some data transmitted by my laptop that I had to process? I updated the code to automatically display all RDA bytes it reads, and have the user verify each byte.</p>
+<p>When this program was run, the exact same byte was read: 0x40.
+This also corresponds to a status byte indicating an RDA. This was confusing. Initially, I thought the display was not updating properly after the status byte had been displayed, but this was soon disproved by checking the IMSAI front panel using <em>single step</em> instead of <em>run</em> to run programs.</p>
+<p>The thing is, when single stepping a program on the front panel, if you encounter an <code>IN</code> or <code>OUT</code> instruction, the IMSAI will actually show you the byte being read into or from the <em>accumulator (A)</em> register.</p>
+<p><img src="/image/post/cremenco_tuart_debugging/0x40_byte_verification_data_bus.png" alt="0x40 Byte Verification on Data Bus"></p>
+<p>This meant that when I ran the <code>IN</code> instruction to read a received byte from the TU-ART, it was indeed returning 0x40 to the IMSAI.</p>
+<p>At this point, I reached the conclusion that the TU-ART board is not working as it should. I would most likely attribute this to a hardware defect, maybe an IC on the board had been burned out? We can rule out faulty connections on the board, since I had continuity checked all the different components, and even checked resistances and capacitances.</p>
+<p>The device does reset successfully. It was able to drive the Serial connection lines to around <em>4.5V</em>, which is the desired behaviour. 
+The perpetual 0x40 byte, that does not reset the RDA status bit is indicates that there is something on the board not working as expected.</p>
+<h2 id="conclusion">Conclusion<a href="#conclusion" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<p>The conclusion was reached that we need to try and use a different UART board on the IMSAI, and Professor Lanterman just pinged us a couple hours ago that the new ones he had ordered have arrived! Hopefully one of those has better success!</p>
+<h2 id="appendix">Appendix<a href="#appendix" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<h3 id="appendix-a-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board--original">Appendix A [Simple Prorgam to I/O via Serial Port A on Cremenco TU-ART board – original]<a href="#appendix-a-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board--original" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">; Adapated from Programming Examples in:
+</span></span></span><span class="line"><span class="cl"><span class="c">; http://www.s100computers.com/Hardware%20Manuals/Cromemco/Cromemco%20TU-ART%20Manual.pdf
+</span></span></span><span class="line"><span class="cl"><span class="c">; Calvin Khiddee-Wu
+</span></span></span><span class="line"><span class="cl"><span class="c">; 4/10/22
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">mvi</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Send character output
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">outchar:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ani</span> <span class="no">TBE</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jz</span> <span class="no">outchar</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="mi">0xFF</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">jp</span> <span class="no">outchar</span>
+</span></span></code></pre></div><h3 id="appendix-b-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board---modified">Appendix B [Simple Prorgam to I/O via Serial Port A on Cremenco TU-ART board - modified]<a href="#appendix-b-simple-prorgam-to-io-via-serial-port-a-on-cremenco-tu-art-board---modified" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c">; Adapated from Programming Examples in:
+</span></span></span><span class="line"><span class="cl"><span class="c">; http://www.s100computers.com/Hardware%20Manuals/Cromemco/Cromemco%20TU-ART%20Manual.pdf
+</span></span></span><span class="line"><span class="cl"><span class="c">; and from a similar program authored by Calvin Khiddee-Wu
+</span></span></span><span class="line"><span class="cl"><span class="c">; Ananay Gupta
+</span></span></span><span class="line"><span class="cl"><span class="c">; 4/11/22
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">RDA</span><span class="p">:</span>   <span class="no">equ</span> <span class="mi">40</span><span class="no">H</span>     <span class="c">; Read Data available
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Send character output
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nl">outchar:</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">and</span> <span class="no">TBE</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">cp</span> <span class="no">TBE</span>        <span class="c">; check for a TBE, if one exits, wait for user to intervene
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">END</span>  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="no">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span> 
+</span></span><span class="line"><span class="cl">        <span class="no">and</span> <span class="no">RDA</span>       <span class="c">; check if data is available to be read. if there is, wait for user to intervene
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">END</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="mi">88</span><span class="no">H</span>       <span class="c">; we want to transmit 0x88
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>        <span class="no">out</span> <span class="mi">0</span><span class="no">FFH</span><span class="p">,</span> <span class="no">a</span>   <span class="c">; sanity check: display to front panel LEDs
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="no">out</span> <span class="no">ADATA</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; output as data from Serial output A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>	<span class="no">jp</span> <span class="no">outchar</span>      <span class="c">; loop
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">END:</span>
+</span></span><span class="line"><span class="cl"><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="mi">0</span><span class="no">FFH</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="mi">0</span><span class="no">f0h</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cp</span> <span class="mi">0</span><span class="no">F0H</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">outchar</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">end</span>
+</span></span></code></pre></div><h3 id="appendix-c-program-to-readwrite-bytes-and-manually-control-bytes-via-serial-port-a-on-cremenco-tu-art">Appendix C [Program to Read/Write bytes and manually control bytes via Serial Port A on Cremenco TU-ART]<a href="#appendix-c-program-to-readwrite-bytes-and-manually-control-bytes-via-serial-port-a-on-cremenco-tu-art" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">ABASE:</span> <span class="nf">equ</span> <span class="mi">080</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">BAUDA:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">C0H</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ABDR:</span>  <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Baud rate port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">RESET:</span> <span class="nf">equ</span> <span class="mi">9</span> <span class="c">; RESET + INTA Command
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">ACMD</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">MASKA:</span> <span class="nf">equ</span> <span class="mi">0</span>       <span class="c">; No interrupts from A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">AMSK</span><span class="p">:</span>  <span class="no">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">3</span> <span class="c">; Interrupt mask port A
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">ASTAT:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">ADATA:</span> <span class="nf">equ</span> <span class="no">ABASE</span><span class="err">+</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nl">TBE:</span>   <span class="nf">equ</span> <span class="mi">80</span><span class="no">H</span>	   <span class="c">; Buffer empty bit
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="no">RDA</span><span class="p">:</span>   <span class="no">equ</span> <span class="mi">40</span><span class="no">H</span>     <span class="c">; Read Data available
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">DISP:</span> <span class="nf">equ</span> <span class="mi">0</span><span class="no">FFH</span>
+</span></span><span class="line"><span class="cl"><span class="nl">STACK:</span> <span class="nf">equ</span> <span class="mi">200</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">; Echo program
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">org</span> <span class="mi">0000</span><span class="no">H</span>
+</span></span><span class="line"><span class="cl"><span class="c">; Initialization
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>    <span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">out</span> <span class="mi">0xFF</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ld</span> <span class="no">SP</span><span class="p">,</span> <span class="no">STACK</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">RESET</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ACMD</span><span class="p">,</span> <span class="no">a</span>    <span class="c">; Device A reset
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">MASKA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">AMSK</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">a</span><span class="p">,</span> <span class="no">BAUDA</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">out</span> <span class="no">ABDR</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="nf">ld</span> <span class="no">b</span><span class="p">,</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl"><span class="nl">START:</span> <span class="c">; outputs status byte and waits for user to confirm that they have seen it
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ASTAT</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="no">DISP</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">call</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">READ</span> <span class="c">; read next received byte
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">READ:</span> <span class="c">; outputs byte read from TU-ART and waits for user to confirm that they have seen it
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">ADATA</span>
+</span></span><span class="line"><span class="cl"><span class="nf">out</span> <span class="no">DISP</span><span class="p">,</span> <span class="no">a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">call</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">START</span> <span class="c">; read status byte
+</span></span></span><span class="line"><span class="cl"><span class="c"></span>
+</span></span><span class="line"><span class="cl"><span class="nl">INPLOOP:</span> <span class="c">; waits for user to complain that they have seen the byte that is on the display and returns
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nf">in</span> <span class="no">a</span><span class="p">,</span> <span class="no">DISP</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cp</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">z</span><span class="p">,</span> <span class="no">RETURN</span>
+</span></span><span class="line"><span class="cl"><span class="nf">jp</span> <span class="no">INPLOOP</span>
+</span></span><span class="line"><span class="cl"><span class="nl">RETURN:</span>
+</span></span><span class="line"><span class="cl"><span class="nf">inc</span> <span class="no">b</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ret</span>
+</span></span></code></pre></div>
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>Author: Ananay Gupta</p>
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/serialcard">SerialCard</a></span><span class="tag"><a href="/tags/uart">UART</a></span><span class="tag"><a href="/tags/hardware">Hardware</a></span><span class="tag"><a href="/tags/newcard">NewCard</a></span><span class="tag"><a href="/tags/imsai-sio">IMSAI SIO</a></span><span class="tag"><a href="/tags/s100-sio">S100 SIO</a></span><span class="tag"><a href="/tags/fpga">FPGA</a></span><span class="tag"><a href="/tags/debugging">Debugging</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1849 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2022-04-26</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="prev-post" href="/posts/fpga_uart/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>FPGA: UART</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2022 <a href="/">the IMSAI Gang</a></p>
+		<p><a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+	<script src="/js/main.min.17d74807d860815985fea50c0164a0c132f23813ff704cf899739c92249d91e1.js" integrity="sha256-F9dIB9hggVmF/qUMAWSgwTLyOBP/cEz4mXOckiSdkeE="></script>
+
+</body>
+
+</html>
